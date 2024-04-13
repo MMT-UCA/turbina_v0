@@ -1,3 +1,6 @@
+#-----------------------------------------------------------------#
+#MÓDULO DE INTERPOLACIÓN 
+#-----------------------------------------------------------------#
 #IMPORTS
 
 import pandas as pd
@@ -13,7 +16,7 @@ def interpolate_fcn(x_1,y_1,x_2,y_2,x_3):
     return y_3
 
 #-----------------------------------------------------------------#
-
+#Devuelve los límites del intervalo en el que se encuentra alpha
 def interpolate_alpha(x_list, y_list, alpha):
     # Encontrar el valor inmediatamente superior en la lista
     alpha_upper = x_list[x_list >= alpha].min()
@@ -28,7 +31,7 @@ def interpolate_alpha(x_list, y_list, alpha):
     return (alpha_lower, Cl_lower), (alpha_upper, Cl_upper)
 
 #-----------------------------------------------------------------#
-
+#Funciones principales de interpolación de Cl y Cd en función de Re
 def interpolate_Cl(alpha,Re):
 
     if 50000 <= Re < 100000:

@@ -68,8 +68,8 @@ def interpolate_coordinates(x,x_list,y_list):
     return y_value
 
 #-----------------------------------------------------------------#
-
-def camber(df,x): #Curvatura
+#Curvatura
+def camber(df,x): 
 
     x_coordinates = df['x']
     y_coordinates = df['y']
@@ -99,6 +99,7 @@ def camber_max(df):
     return max_camber
 
 #-----------------------------------------------------------------#
+#Curvatura media
 def camber_med(df):
 
     camber_values = []
@@ -113,8 +114,8 @@ def camber_med(df):
     return med_camber
 
 #-----------------------------------------------------------------#
-
-def thickness(df,x): #Espesor
+#Espesor
+def thickness(df,x): 
 
     x_coordinates = df['x']
     y_coordinates = df['y']
@@ -144,7 +145,7 @@ def thickness_max(df):
     return max_thickness
 
 #-----------------------------------------------------------------#
-
+#Grafica la curvatura y el perfil
 def plot_camber(df):
 
     camber_values = []

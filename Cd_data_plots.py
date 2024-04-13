@@ -1,3 +1,6 @@
+#-----------------------------------------------------------------#
+#Grafica Cd vs α
+#-----------------------------------------------------------------#
 #IMPORTS
 
 import pandas as pd
@@ -14,7 +17,7 @@ df_4 = pd.read_csv(Datos.url_Re500000, skiprows=10)
 df_5 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
 
 #-----------------------------------------------------------------#
-#Cl vs α
+#Cd vs α
 
 # Extrae las columnas X e Y
 columna_x = df['Alpha']

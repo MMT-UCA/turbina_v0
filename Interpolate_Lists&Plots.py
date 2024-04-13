@@ -1,3 +1,6 @@
+#-----------------------------------------------------------------#
+#Módulo para ver los resultados de la interpolación, crea listas de datos y los grafica
+#-----------------------------------------------------------------#
 #IMPORTS
 
 import pandas as pd

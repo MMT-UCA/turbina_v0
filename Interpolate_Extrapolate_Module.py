@@ -1,3 +1,6 @@
+#-----------------------------------------------------------------#
+#MÓDULO PRINCIPAL DE INTERPOLACIÓN Y EXTRAPOLACIÓN
+#-----------------------------------------------------------------#
 #IMPORTS
 
 import pandas as pd
@@ -9,7 +12,7 @@ import Datos
 import Camber_Module
 
 #-----------------------------------------------------------------#
-
+#Función que calcula Cl y Cd para Re = [50000, 100000, 200000, 500000, 1000000]
 def Interpolate_Extrapolate_Re(alpha,Re):
     # Re listado
 
@@ -54,7 +57,7 @@ def Interpolate_Extrapolate_Re(alpha,Re):
 
 
 #-----------------------------------------------------------------#
-
+#Función principal, calcula Cl y Cd para Re ≠ [50000, 100000, 200000, 500000, 1000000]
 def Interpolate_Extrapolate(alpha,Re):
 
     df_airfoil = pd.read_csv(Datos.archivo_csv)
@@ -125,7 +128,8 @@ def Interpolate_Extrapolate(alpha,Re):
     return Cl, Cd
 
 #-----------------------------------------------------------------#
-
+#Cl y Cd corregidos según la influencia del número de Mach
+#EN DESARROLLO
 def Cl_Cd_corregido(alpha, alpha_rad, Cl, Cd, Mach):
 
     transonic = False

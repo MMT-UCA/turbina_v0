@@ -1,3 +1,6 @@
+#-----------------------------------------------------------------#
+#MÓDULO DE EXTRAPOLACIÓN SEGÚN LA POLAR DE LORENZO BATTISTI
+#-----------------------------------------------------------------#
 #IMPORTS
 
 import pandas as pd
@@ -48,12 +51,12 @@ def alpha_zero(df):
 #-----------------------------------------------------------------#
 
 #Función principal de extrapolación, según la simetría del perfil llama a la función correspondiente
-def extrapolate(df,alpha,Re):
-    if symmetry(df):
-        resultado = extrapolate_symmetrical(alpha,Re)
+def extrapolate(df,df_airfoil,alpha,Re):
+    if symmetry(df_airfoil):
+        Cl, Cd = extrapolate_symmetrical(df,df_airfoil,alpha,Re)
     else:
-        resultado = extrapolate_asymmetrical(alpha,Re)
-    return resultado
+        Cl, Cd = extrapolate_asymmetrical(df,df_airfoil,alpha,Re)
+    return Cl, Cd
 
 
 #-----------------------------------------------------------------#
@@ -237,29 +240,35 @@ def extrapolate_symmetrical(df,df_airfoil,alpha,Re):
 
 #-----------------------------------------------------------------#
 
-#PLOT
+#PLOT #Sólo válido para los intervalos de extrapolación, para el intervalo -180_180 ver Interpolate_Extrapolate_Module
 
-#valores_Cl = []
-#valores_Cd = []
-#valores_alpha = []
+""" df = pd.read_csv(Datos.url_Re50000, skiprows=10)
 
-#for alpha in range(-41, -15):
+df_airfoil = pd.read_csv(Datos.archivo_csv)
+
+Re = 47568.56
+
+valores_Cl = []
+valores_Cd = []
+valores_alpha = []
+
+for alpha in range(-180, -41):
     # Llama a tu función para calcular Cl y Cd
-    #Cl, Cd = extrapolate_asymmetrical(df,df_airfoil,alpha,Re)
+    Cl, Cd = extrapolate(df,df_airfoil,alpha,Re)
     # Agrega los valores a las listas correspondientes
-    #valores_Cl.append(Cl)
-    #valores_Cd.append(Cd)
-    #valores_alpha.append(alpha)
+    valores_Cl.append(Cl)
+    valores_Cd.append(Cd)
+    valores_alpha.append(alpha)
 
-#plt.scatter(valores_alpha, valores_Cl, color='red')
+plt.scatter(valores_alpha, valores_Cl, color='red')
 
 # Agrega etiquetas y título al gráfico
-#plt.xlabel('α(°)')
-#plt.ylabel('Cl')
-#plt.title('Cl vs α for Different Reynolds Numbers')
+plt.xlabel('α(°)')
+plt.ylabel('Cl')
+plt.title('Cl vs α for Different Reynolds Numbers')
 
 # Agrega una leyenda
-#plt.legend()
+plt.legend()
 
 # Muestra el gráfico
-#plt.show()
+plt.show() """

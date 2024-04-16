@@ -91,7 +91,7 @@ def helice(C):
     Visc = CP.PropsSI("V", "T", Tempe, "P", Presi, "air")
     Beta_crucero, Beta_n_crucero = Torsion()
     T = 0
-    T_anterior = 3 #####CAMBIAR####
+    T_anterior = 1 
 
     j = 0
     #Bucle
@@ -99,10 +99,10 @@ def helice(C):
         T_anterior = T
         T = 0
         Q = 0
-        i = 1
+        i = 0
         r_vind = Datos.r_o
         while r_vind <= (Datos.D)/2:
-            Beta_radio = Datos.Beta - 1 + Beta_crucero[i]
+            Beta_radio = Datos.Beta - Beta_n_crucero + Beta_crucero[i]
             Beta_rad = Beta_radio * Datos.pi / 180
             #Call velocidades inducidas 
             Ci, omega_i = velocidades_inducidas(r_vind, T_anterior,Beta_rad,C)
@@ -121,10 +121,11 @@ def helice(C):
             A_sonido = CP.PropsSI("A", "T", Tempe, "P", Presi, "air")
             Mach = ((C_Tcuad) ** 0.5) / A_sonido
             #####Call Cl_Cd corregido#####
+            Cl_corregido, Cd_corregido = Interpolate_Extrapolate_Module.Cl_Cd_corregido(alfa,Cl,Cd,Mach)
 
             #Cálculo de tracción y potencia
-            dTrac = C_Tcuad * (Cl * math.cos(Phi_rad) - Cd * math.sin(Phi_rad)) * Datos.dr
-            dQ = C_Tcuad * (Cl * math.sin(Phi_rad) + Cd * math.cos(Phi_rad)) * r_vind * Datos.dr
+            dTrac = C_Tcuad * (Cl_corregido * math.cos(Phi_rad) - Cd_corregido * math.sin(Phi_rad)) * Datos.dr
+            dQ = C_Tcuad * (Cl_corregido * math.sin(Phi_rad) + Cd_corregido * math.cos(Phi_rad)) * r_vind * Datos.dr
             T = T + dTrac
             Q = Q + dQ
 
@@ -139,10 +140,14 @@ def helice(C):
 
     W = Q * Datos.omega
 
+    return W, T, Q
+
 #-----------------------------------------------------------------#
 #PRUEBAS
 
-helice(0)
+W, T, Q = helice(0)
+
+print('W,T,Q:', W, T, Q)
 
 #Beta_crucero = Torsion()    
 #print(Beta_crucero)    

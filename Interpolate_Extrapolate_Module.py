@@ -10,6 +10,7 @@ import Extrapolate_Module
 import Interpolate_Module
 import Datos
 import Camber_Module
+import Factor_Corrector_Module
 
 #-----------------------------------------------------------------#
 #Función que calcula Cl y Cd para Re = [50000, 100000, 200000, 500000, 1000000]
@@ -129,8 +130,7 @@ def Interpolate_Extrapolate(alpha,Re):
 
 #-----------------------------------------------------------------#
 #Cl y Cd corregidos según la influencia del número de Mach
-#EN DESARROLLO
-def Cl_Cd_corregido(alpha, alpha_rad, Cl, Cd, Mach):
+def Cl_Cd_corregido(alpha, Cl, Cd, Mach):
 
     transonic = False
     supersonic = False
@@ -138,25 +138,40 @@ def Cl_Cd_corregido(alpha, alpha_rad, Cl, Cd, Mach):
     df_airfoil = pd.read_csv(Datos.archivo_csv)
     espesor = Camber_Module.thickness_max(df_airfoil)
     curvatura_media = Camber_Module.camber_med(df_airfoil)
+    alpha_rad = alpha*Datos.pi/180
 
     Pi = np.pi
-    Cl_zero = ((2 * Pi) / ((1 - (0) ^ 2) ^ 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media)
+    Cl_zero = ((2 * Pi) / ((1 - (0) ** 2) ** 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media)
 
     factor_corrector = Cl/Cl_zero
+    factor_corrector_sub, factor_corrector_trans, factor_corrector_sup = Factor_Corrector_Module.Factor_corrector_Mach(Mach)
 
     if Mach <= 0.8:
-        Cl_corregido = (((2 * Pi) / ((1 - (Mach) ^ 2) ^ 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media))*factor_corrector
+        Cl_corregido = (((2 * Pi) / ((1 - (Mach) ** 2) ** 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media))*factor_corrector
+        Cd_corregido = Cd * factor_corrector_sub
     elif Mach < 1.2:
         transonico = True
-        
+        Cl_corregido_1 = (((2 * Pi) / ((1 - (0.8) ** 2) ** 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media))*factor_corrector
+        Cl_corregido_2 = ((4 * alpha_rad) / ((((1.2) ** 2) - 1) ** 0.5)) * factor_corrector
+        Cl_corregido = Cl_corregido_1 + ((Mach - 0.8) / (1.2 - 0.8)) * (Cl_corregido_2 - Cl_corregido_1)
+        Cd_corregido = Cd * factor_corrector_trans
+    else:
+        supersonico = True
+        Cl_corregido = ((4 * alpha_rad) / ((((Mach) ** 2) - 1) ** 0.5)) * factor_corrector 
+        Cd_corregido = Cd * factor_corrector_sup
+
 
     return Cl_corregido, Cd_corregido
 
-#Cl, Cd = Interpolate_Extrapolate(11,54976.867535048)
-
-#print('Cl,Cd:',Cl, Cd)
 
 #-----------------------------------------------------------------#
+#PRUEBAS
+
+""" Cl, Cd = Interpolate_Extrapolate(11,54976.867535048)
+Cl_co, Cd_co = Cl_Cd_corregido(11,Cl,Cd,1.2)
+
+print('Cl,Cd:',Cl, Cd)
+print('Cl_corregido,Cd_corregido:',Cl_co, Cd_co) """
 
 #PLOT
 

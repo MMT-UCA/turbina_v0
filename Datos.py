@@ -33,7 +33,7 @@ RPM = 2000
 RPS = RPM/60 #equivalente a n de Excel
 AR = D/cuerda
 Palas = 5 
-dr = 0.01 #m
+dr = 0.1 #m
 
 error_helice = 0.1
 omega = 2*pi*RPS

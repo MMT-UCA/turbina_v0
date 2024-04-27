@@ -88,8 +88,8 @@ def Interpolate_Extrapolate(alpha,Re):
             Cl = Interpolate_Module.interpolate_fcn(Re_lower,Cl_lower,Re_upper,Cl_upper,Re)
             Cd = Interpolate_Module.interpolate_fcn(Re_lower,Cd_lower,Re_upper,Cd_upper,Re)
         if 500000 < Re < 1000000:
-            Re_lower = 100000
-            Re_upper = 200000
+            Re_lower = 500000
+            Re_upper = 1000000
             Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower)
             Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper)
             Cl = Interpolate_Module.interpolate_fcn(Re_lower,Cl_lower,Re_upper,Cl_upper,Re)
@@ -147,21 +147,30 @@ def Cl_Cd_corregido(alpha, Cl, Cd, Mach):
     factor_corrector_sub, factor_corrector_trans, factor_corrector_sup = Factor_Corrector_Module.Factor_corrector_Mach(Mach)
 
     if Mach <= 0.8:
+        transonico = False
+        supersonico = False
         Cl_corregido = (((2 * Pi) / ((1 - (Mach) ** 2) ** 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media))*factor_corrector
-        Cd_corregido = Cd * factor_corrector_sub
     elif Mach < 1.2:
         transonico = True
+        supersonico = False
         Cl_corregido_1 = (((2 * Pi) / ((1 - (0.8) ** 2) ** 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media))*factor_corrector
         Cl_corregido_2 = ((4 * alpha_rad) / ((((1.2) ** 2) - 1) ** 0.5)) * factor_corrector
-        Cl_corregido = Cl_corregido_1 + ((Mach - 0.8) / (1.2 - 0.8)) * (Cl_corregido_2 - Cl_corregido_1)
-        Cd_corregido = Cd * factor_corrector_trans
+        Cl_corregido = Cl_corregido_1 + ((Mach - 0.8) / (1.2 - 0.8)) * (Cl_corregido_2 - Cl_corregido_1)    
     else:
+        transonico = False
         supersonico = True
         Cl_corregido = ((4 * alpha_rad) / ((((Mach) ** 2) - 1) ** 0.5)) * factor_corrector 
+        
+
+    if Mach < 0.8:
+        Cd_corregido = Cd * factor_corrector_sub
+    elif Mach < 1.25:
+        Cd_corregido = Cd * factor_corrector_trans
+    else:
         Cd_corregido = Cd * factor_corrector_sup
 
 
-    return Cl_corregido, Cd_corregido
+    return Cl_corregido, Cd_corregido, transonico, supersonico
 
 
 #-----------------------------------------------------------------#
@@ -175,28 +184,29 @@ print('Cl_corregido,Cd_corregido:',Cl_co, Cd_co) """
 
 #PLOT
 
-#valores_Cl = []
-#valores_Cd = []
-#valores_alpha = []
-#Re = 54976.867535048
+""" valores_Cl = []
+valores_Cd = []
+valores_alpha = []
+Re = 398465
 
-#for alpha in range(-180, 180):
+for alpha in range(-180, 180):
     # Llama a tu función para calcular Cl y Cd
-    #Cl, Cd = Interpolate_Extrapolate(alpha,Re)
+    Cl, Cd = Interpolate_Extrapolate(alpha,Re)
+    print('alpha,Cd:', alpha, Cd)
     # Agrega los valores a las listas correspondientes
-    #valores_Cl.append(Cl)
-    #valores_Cd.append(Cd)
-    #valores_alpha.append(alpha)
+    valores_Cl.append(Cl)
+    valores_Cd.append(Cd)
+    valores_alpha.append(alpha)
 
-#plt.scatter(valores_alpha, valores_Cl, color='red')
+plt.scatter(valores_alpha, valores_Cd, color='red')
 
 # Agrega etiquetas y título al gráfico
-#plt.xlabel('α(°)')
-#plt.ylabel('Cl')
-#plt.title('Cl vs α')
+plt.xlabel('α(°)')
+plt.ylabel('Cl')
+plt.title('Cl vs α')
 
 # Agrega una leyenda
-#plt.legend()
+plt.legend()
 
 # Muestra el gráfico
-#plt.show()
+plt.show() """

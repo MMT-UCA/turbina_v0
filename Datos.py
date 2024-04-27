@@ -10,8 +10,8 @@ C_d = 0.02
 A_a = 16 #m^2
 C_crucero = 593 #km/h
 dt = 1 #s
-t_fin = 600 #s
-Z = 22000 #m
+t_fin = 60 #s
+Z = 0 #m
 C = 0
 x = 0
 
@@ -68,15 +68,18 @@ url_Re50000="xf-naca2411-il-50000.csv"
 url_Re100000="xf-naca2411-il-100000.csv"
 #Re200000
 
-url_Re200000="http://airfoiltools.com/polar/csv?polar=xf-naca2411-il-200000"
+#url_Re200000="http://airfoiltools.com/polar/csv?polar=xf-naca2411-il-200000"
+url_Re200000="xf-naca2411-il-200000.csv"
 
 #Re500000
 
-url_Re500000="http://airfoiltools.com/polar/csv?polar=xf-naca2411-il-500000"
+#url_Re500000="http://airfoiltools.com/polar/csv?polar=xf-naca2411-il-500000"
+url_Re500000="xf-naca2411-il-500000.csv"
 
 #Re1000000
 
-url_Re1000000="http://airfoiltools.com/polar/csv?polar=xf-naca2411-il-1000000"
+#url_Re1000000="http://airfoiltools.com/polar/csv?polar=xf-naca2411-il-1000000"
+url_Re1000000="xf-naca2411-il-1000000.csv"
 
 #Coordenadas
 

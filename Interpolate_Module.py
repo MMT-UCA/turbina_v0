@@ -11,7 +11,10 @@ import Datos
 
 def interpolate_fcn(x_1,y_1,x_2,y_2,x_3):
 
-    y_3 = y_1 + ((y_2-y_1)/(x_2-x_1))*(x_3-x_1)
+    if x_1 == x_2:
+        y_3 = y_1
+    else:
+        y_3 = y_1 + ((y_2-y_1)/(x_2-x_1))*(x_3-x_1)
 
     return y_3
 
@@ -27,7 +30,7 @@ def interpolate_alpha(x_list, y_list, alpha):
     # Obtener los valores de Cl correspondientes a los alphas encontrados
     Cl_lower = y_list[x_list == alpha_lower].iloc[0] if not pd.isnull(alpha_lower) else None
     Cl_upper = y_list[x_list == alpha_upper].iloc[0] if not pd.isnull(alpha_upper) else None
-
+            
     return (alpha_lower, Cl_lower), (alpha_upper, Cl_upper)
 
 #-----------------------------------------------------------------#
@@ -53,6 +56,11 @@ def interpolate_Cl(alpha,Re):
         df = pd.read_csv(Datos.url_Re500000, skiprows=10)
         df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
         Re_lower = 500000
+        Re_upper = 1000000
+    elif Re == 1000000:
+        df = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        Re_lower = 1000000
         Re_upper = 1000000
     else:
         # Haz algo si ninguna de las condiciones anteriores se cumple
@@ -105,6 +113,11 @@ def interpolate_Cd(alpha,Re):
         df = pd.read_csv(Datos.url_Re500000, skiprows=10)
         df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
         Re_lower = 500000
+        Re_upper = 1000000
+    elif Re == 1000000:
+        df = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        Re_lower = 1000000
         Re_upper = 1000000
     else:
         # Si ninguna de las condiciones anteriores se cumple

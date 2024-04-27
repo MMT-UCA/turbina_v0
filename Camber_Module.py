@@ -141,6 +141,7 @@ def thickness_max(df):
         thickness_values.append(thickness_value)
 
     max_thickness = max(thickness_values)
+    #max_thickness = 0.019965931813841535 * 2
 
     return max_thickness
 
@@ -180,4 +181,4 @@ def plot_camber(df):
 
 camber_m = camber_med(df)
 
-print('Curvatura máxima:', camber_m) """
+print('Curvatura máxima:', camber_m)  """

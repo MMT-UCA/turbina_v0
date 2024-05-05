@@ -1,262 +1,83 @@
-If alfa_dato(ind_Re - 1, 1) > alfa Then 'alfa fuera de rango. es menor que el mínimo tabulado
-    
-            'Extrapolación de la polar de Lorenzo Battisti et al https://doi.org/10.1016/j.renene.2020.03.150
-                    
-            alfa_min = alfa_dato(ind_Re - 1, 1) 'Selecciona el alfa de separación
-            Cl_min = Cl_dato(ind_Re - 1, 1)
-            Cd_min = Cd_dato(ind_Re - 1, 1)
-            
-            'Cálculo de parámetros para el modelo de Lorenzo Battisti
-            Cd_90 = 1.98 - 0.64 * (1 / 2 * (t_c) ^ 2) - 0.44 * t_c + 1.39 * h_c
-            'Cd_270 = 1.98 - 0.64 * (1 / 2 * (t_c) ^ 2) - 0.44 * t_c - 1.39 * h_c
-            'beta_prim = alfa - alfazero(ind_Re - 1) * Cos(alfa * Pi / 180)
-              
-            'Cd_func = (Cd_90 + Cd_270) / 2 + ((Cd_90 - Cd_270) / 2) * Sin(beta_prim * Pi / 180)
-            Log10 = Log(Re_numero(ind_Re - 1)) / Log(10)
-            CDf = (0.455 / (Log10 ^ 2.58)) - 1700 / Re_numero(ind_Re - 1)
-                 
-            'Cálculo del coeficiente de la normal y de la tangencial de la Polar
-            CN = (Cd_90) * ((Sin(alfa * Pi / 180)) + 0.0023 * (Sin(2 * alfa * Pi / 180)) / (0.38 + (0.62 * Abs((Sin(alfa * Pi / 180)))) + (3.7 * t_c * ((Cos(alfa * Pi / 180)) ^ 8))))
-            CT = (Cd_90) * 0.3 * t_c * (Abs(Sin(alfa * Pi / 180) + 0.1 * Sin(2 * alfa * Pi / 180))) * (1 - 2 * Cos(alfa * Pi / 180)) - CDf * Cos(alfa * Pi / 180)
-            
-            'Cálculo de los coeficientes de sustentación y arrastre
-            Cl_1 = CN * Cos(alfa * Pi / 180) + CT * Sin(alfa * Pi / 180)
-            Cd_1 = (CN * Sin(alfa * Pi / 180) - CT * Cos(alfa * Pi / 180)) * (1 - 0.4 * (1 - Exp(-(11.4) / (AR / (Sin(alfa * Pi / 180))))))
+#Función hélice que arregla el problema de la dispersión de los datos del final pero sólo funciona cuando se llama
+#a la función para una lista de valores, por ejemplo un plot, y no cuando sólo se llama para un valor ya que ultimo_T estaría vacío
+
+""" ultimo_T = None
+ultimo_Beta = None
+def helice(C,Beta):
+    global ultimo_T
+    global ultimo_Beta
+
+    if Beta >= 50 and C >=200 and ultimo_T == 0 and ultimo_Beta == Beta:
+        T = 0 
+        Q = 0
+
+    else:
+
+        rhoz = rho(Datos.Z)
+        Tempe = Temp(Datos.Z)
+        Presi = Pres(Datos.Z) * 1000
+        Visc = CP.PropsSI("V", "T", Tempe, "P", Presi, "air")
+        Beta_crucero, Beta_n_crucero = Torsion()
+        T = 0
+        T_anterior = 1 
+
+        j = 0
+        #Bucle
+        while abs(T - T_anterior) >= 0.1 and j <= 200:
+            T_anterior = T
+            T = 0
+            Q = 0
+            i = 0
+            r_vind = Datos.r_o
+            while r_vind <= (Datos.D)/2:
+                Beta_radio = Beta - Beta_n_crucero + Beta_crucero[i]
+                Beta_rad = Beta_radio * Datos.pi / 180
+                #Call velocidades inducidas 
+                Ci, omega_i = velocidades_inducidas(r_vind, T_anterior,Beta_rad,C)
+                C_Tcuad = (C + Ci) ** 2 + ((Datos.omega - omega_i) * r_vind) ** 2
+                Phi_rad = math.atan((C + Ci) / ((Datos.omega - omega_i) * r_vind))
         
-            'En caso de que alfa esté entre el de desprendimiento (alfa_min) y el de separación (-45)
-            If alfa >= -45 And alfa <= alfa_min Then
-            
-                'Cálculo de los coeficientes de desprendimiento
-                CT_ds_menos = ((Cl_min / Cos(alfa_min * Pi / 180)) - (Cd_min / Sin(alfa_min * Pi / 180))) / ((Sin(alfa_min * Pi / 180) / Cos(alfa_min * Pi / 180)) + (Cos(alfa_min * Pi / 180) / Sin(alfa_min * Pi / 180)))
-                CN_ds_menos = (Cl_min - (CT_ds_menos * Sin(alfa_min * Pi / 180))) / (Cos(alfa_min * Pi / 180))
-                f_menos = ((alfa + 45) / (alfa_min + 45)) ^ 2
-                
-                'Cálculo de los coeficientes de separación
-                'beta_prim = -45 - alfazero(ind_Re - 1) * Cos(-45 * Pi / 180)
-                'Cd_func = (Cd_90 + Cd_270) / 2 + ((Cd_90 - Cd_270) / 2) * Sin(beta_prim * Pi / 180)
-                Log10 = Log(Re_numero(ind_Re - 1)) / Log(10)
-                CDf = (0.455 / (Log10 ^ 2.58)) - 1700 / Re_numero(ind_Re - 1)
-                
-                CN_SEP = (Cd_90) * ((Sin(-45 * Pi / 180)) + 0.0023 * (Sin(2 * -45 * Pi / 180)) / (0.38 + (0.62 * Abs((Sin(-45 * Pi / 180)))) + (3.7 * t_c * ((Cos(-45 * Pi / 180)) ^ 8))))
-                CT_SEP = (Cd_90) * 0.3 * t_c * (Abs(Sin(-45 * Pi / 180) + 0.1 * Sin(2 * -45 * Pi / 180))) * (1 - 2 * Cos(-45 * Pi / 180)) - CDf * Cos(-45 * Pi / 180)
-                
-                'Cálculo del coeficiente de la normal y de la tangencial por interpolación según Lorenzo Battisti
-                CN_menos = CN_ds_menos * f_menos + CN_SEP * (1 - f_menos)
-                CT_menos = CT_ds_menos * f_menos + CT_SEP * (1 - f_menos)
-                
-                'Cálculo de los coeficientes de sustentación y arrastre
-                Cl_1 = CN_menos * Cos(alfa * Pi / 180) + CT_menos * Sin(alfa * Pi / 180)
-                Cd_1 = (CN_menos * Sin(alfa * Pi / 180) - CT_menos * Cos(alfa * Pi / 180)) * (1 - 0.4 * (1 - Exp(-(11.4) / (AR / (Sin(alfa * Pi / 180))))))
-            End If
+                #Cálculo de beta en cada posición
+                alfa_rad = Beta_rad - Phi_rad
+                Phi_grad = Phi_rad * 180 / Datos.pi
+                alfa = 180 * alfa_rad / Datos.pi
+                Re = rhoz * (C_Tcuad) ** 0.5 * Datos.cuerda / Visc
+                #####Call Cl_Cd#####
+                Cl, Cd = Interpolate_Extrapolate_Module.Interpolate_Extrapolate(alfa, Re)
 
+                #Cálculo de Mach
+                A_sonido = CP.PropsSI("A", "T", Tempe, "P", Presi, "air")
+                Mach = ((C_Tcuad) ** 0.5) / A_sonido
+                #####Call Cl_Cd corregido#####
+                Cl_corregido, Cd_corregido, transonico, supersonico = Interpolate_Extrapolate_Module.Cl_Cd_corregido(alfa,Cl,Cd,Mach)
 
+                #Cálculo de tracción y potencia
+                dTrac = C_Tcuad * (Cl_corregido * math.cos(Phi_rad) - Cd_corregido * math.sin(Phi_rad)) * Datos.dr
+                dQ = C_Tcuad * (Cl_corregido * math.sin(Phi_rad) + Cd_corregido * math.cos(Phi_rad)) * r_vind * Datos.dr
+                T = T + dTrac
+                Q = Q + dQ
 
-
-
-
-
-
-
-
-alpha_column = df['Alpha']
-    alpha_min_tab = alpha_column.iloc[1]
-    alpha_max_tab = alpha_column.iloc[-1]
-    Cl_column = df['Cl']
-    Cl_min_tab = Cl_column.iloc[1]
-    Cl_max_tab = Cl_column.iloc[-1]
-    Cd_column = df['Cd']
-    Cd_min_tab = Cd_column.iloc[1]
-    Cd_max_tab = Cd_column.iloc[-1]
-
-    t_c = Camber_Module.thickness_max(df_airfoil)
-    h_c = Camber_Module.camber_max(df_airfoil)
-
-    #Cl_1,Cd_1
-    if alpha < alpha_min_tab : #alpha menor que el mínimo tabulado
-        #Cálculo de parámetros
-        CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
-        Log10 = math.log(Re) / math.log(10)
-        CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-        #Cálculo del coeficiente de la normal y de la tangencial de la Polar
-        CN = (CD_90) * ((math.sin(alpha * Datos.pi / 180)) + 0.0023 * (math.sin(2 * alpha * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(alpha * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(alpha * math.pi / 180)) ** 8))))
-        CT = (CD_90) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
-        #Cálculo de los coeficientes de sustentación y arrastre
-        Cl_1 = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd_1 = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-        if alpha >= -45 and alpha <= alpha_min_tab :
-            #Cálculo de los coeficientes de desprendimiento
-            CT_ds_menos = ((Cl_min_tab / math.cos(alpha_min_tab * Datos.pi / 180)) - (Cd_min_tab / math.sin(alpha_min_tab * Datos.pi / 180))) / ((math.sin(alpha_min_tab * Datos.pi / 180) / math.cos(alpha_min_tab * Datos.pi / 180)) + (math.cos(alpha_min_tab * Datos.pi / 180) / math.sin(alpha_min_tab * Datos.pi / 180)))
-            CN_ds_menos = (Cl_min_tab - (CT_ds_menos * math.sin(alpha_min_tab * Datos.pi / 180))) / (math.cos(alpha_min_tab * math.pi / 180))
-            f_menos = ((alpha + 45) / (alpha_min_tab + 45)) ** 2
-            Log10 = math.log(Re) / math.log(10)
-            CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-            #Coeficientes de separación
-            CN_sep = (CD_90) * ((math.sin(-45 * Datos.pi / 180)) + 0.0023 * (math.sin(2 * -45 * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(-45 * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(-45 * math.pi / 180)) ** 8))))
-            CT_sep = (CD_90) * 0.3 * t_c * (abs(math.sin(-45 * Datos.pi / 180) + 0.1 * math.sin(2 * -45 * Datos.pi / 180))) * (1 - 2 * math.cos(-45 * Datos.pi / 180)) - CD_f * math.cos(-45 * Datos.pi / 180)
-            #Cálculo del coeficiente de la normal y de la tangencial por interpolación según Lorenzo Battisti
-            CN_menos = CN_ds_menos * f_menos + CN_sep * (1 - f_menos)
-            CT_menos = CT_ds_menos * f_menos + CT_sep * (1 - f_menos)
-            #Coeficientes de sustentación y resistencia
-            Cl_1 = CN_menos * math.cos(alpha * Datos.pi / 180) + CT_menos * math.sin(alpha * Datos.pi / 180)
-            Cd_1 = (CN_menos * math.sin(alpha * Datos.pi / 180) - CT_menos * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-            
-    else:  #alpha mayor que el máximo tabulado
-        #Cálculo de parámetros
-        CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
-        Log10 = math.log(Re) / math.log(10)
-        CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-        #Cálculo del coeficiente de la normal y de la tangencial de la Polar
-        CN = (CD_90) * ((math.sin(alpha * Datos.pi / 180)) + 0.0023 * (math.sin(2 * alpha * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(alpha * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(alpha * math.pi / 180)) ** 8))))
-        CT = (CD_90) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
-        #Cálculo de los coeficientes de sustentación y arrastre
-        Cl_1 = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd_1 = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-        if alpha <= 45 and alpha >= alpha_max_tab :
-            #Cálculo de los coeficientes de desprendimiento
-            CT_ds_mas = ((Cl_max_tab / math.cos(alpha_max_tab * Datos.pi / 180)) - (Cd_max_tab / math.sin(alpha_max_tab * Datos.pi / 180))) / ((math.sin(alpha_max_tab * Datos.pi / 180) / math.cos(alpha_max_tab * Datos.pi / 180)) + (math.cos(alpha_max_tab * Datos.pi / 180) / math.sin(alpha_max_tab * Datos.pi / 180)))
-            CN_ds_mas = (Cl_max_tab - (CT_ds_mas * math.sin(alpha_max_tab * Datos.pi / 180))) / (math.cos(alpha_max_tab * math.pi / 180))
-            f_mas = ((alpha - 45) / (alpha_max_tab - 45)) ** 2
-            Log10 = math.log(Re) / math.log(10)
-            CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-            #Coeficientes de separación
-            CN_sep = (CD_90) * ((math.sin(45 * Datos.pi / 180)) + 0.0023 * (math.sin(2 * 45 * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(45 * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(45 * math.pi / 180)) ** 8))))
-            CT_sep = (CD_90) * 0.3 * t_c * (abs(math.sin(45 * Datos.pi / 180) + 0.1 * math.sin(2 * 45 * Datos.pi / 180))) * (1 - 2 * math.cos(45 * Datos.pi / 180)) - CD_f * math.cos(45 * Datos.pi / 180)
-            #Cálculo del coeficiente de la normal y de la tangencial por interpolación según Lorenzo Battisti
-            CN_mas = CN_ds_mas * f_mas + CN_sep * (1 - f_mas)
-            CT_mas = CT_ds_mas * f_mas + CT_sep * (1 - f_mas)
-            #Coeficientes de sustentación y resistencia
-            Cl_1 = CN_mas * math.cos(alpha * Datos.pi / 180) + CT_mas * math.sin(alpha * Datos.pi / 180)
-            Cd_1 = (CN_mas * math.sin(alpha * Datos.pi / 180) - CT_mas * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+                i += 1
+                r_vind += Datos.dr
+            T = Datos.Palas * 0.5 * Datos.cuerda * rhoz * T
+            Q = Datos.Palas * 0.5 * Datos.cuerda * rhoz * Q
+            j += 1 
+        if j > 200:
+            if T - T_anterior <=300:
+                T = (T + T_anterior)/2
+                Q = Q
+            else:
+                T = 0
+                Q = 0
     
-    #Cl_2,Cd_2
-    if alpha < alpha_min_tab : #alpha menor que el mínimo tabulado
-        #Cálculo de parámetros
-        CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
-        Log10 = math.log(Re) / math.log(10)
-        CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-        #Cálculo del coeficiente de la normal y de la tangencial de la Polar
-        CN = (CD_90) * ((math.sin(alpha * Datos.pi / 180)) + 0.0023 * (math.sin(2 * alpha * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(alpha * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(alpha * math.pi / 180)) ** 8))))
-        CT = (CD_90) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
-        #Cálculo de los coeficientes de sustentación y arrastre
-        Cl_2 = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd_2 = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-        if alpha >= -45 and alpha <= alpha_min_tab :
-            #Cálculo de los coeficientes de desprendimiento
-            CT_ds_menos = ((Cl_min_tab / math.cos(alpha_min_tab * Datos.pi / 180)) - (Cd_min_tab / math.sin(alpha_min_tab * Datos.pi / 180))) / ((math.sin(alpha_min_tab * Datos.pi / 180) / math.cos(alpha_min_tab * Datos.pi / 180)) + (math.cos(alpha_min_tab * Datos.pi / 180) / math.sin(alpha_min_tab * Datos.pi / 180)))
-            CN_ds_menos = (Cl_min_tab - (CT_ds_menos * math.sin(alpha_min_tab * Datos.pi / 180))) / (math.cos(alpha_min_tab * math.pi / 180))
-            f_menos = ((alpha + 45) / (alpha_min_tab + 45)) ** 2
-            Log10 = math.log(Re) / math.log(10)
-            CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-            #Coeficientes de separación
-            CN_sep = (CD_90) * ((math.sin(-45 * Datos.pi / 180)) + 0.0023 * (math.sin(2 * -45 * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(-45 * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(-45 * math.pi / 180)) ** 8))))
-            CT_sep = (CD_90) * 0.3 * t_c * (abs(math.sin(-45 * Datos.pi / 180) + 0.1 * math.sin(2 * -45 * Datos.pi / 180))) * (1 - 2 * math.cos(-45 * Datos.pi / 180)) - CD_f * math.cos(-45 * Datos.pi / 180)
-            #Cálculo del coeficiente de la normal y de la tangencial por interpolación según Lorenzo Battisti
-            CN_menos = CN_ds_menos * f_menos + CN_sep * (1 - f_menos)
-            CT_menos = CT_ds_menos * f_menos + CT_sep * (1 - f_menos)
-            #Coeficientes de sustentación y resistencia
-            Cl_2 = CN_menos * math.cos(alpha * Datos.pi / 180) + CT_menos * math.sin(alpha * Datos.pi / 180)
-            Cd_2 = (CN_menos * math.sin(alpha * Datos.pi / 180) - CT_menos * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-            
-    else:  #alpha mayor que el máximo tabulado
-        #Cálculo de parámetros
-        CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
-        Log10 = math.log(Re) / math.log(10)
-        CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-        #Cálculo del coeficiente de la normal y de la tangencial de la Polar
-        CN = (CD_90) * ((math.sin(alpha * Datos.pi / 180)) + 0.0023 * (math.sin(2 * alpha * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(alpha * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(alpha * math.pi / 180)) ** 8))))
-        CT = (CD_90) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
-        #Cálculo de los coeficientes de sustentación y arrastre
-        Cl_2 = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd_2 = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-        if alpha <= 45 and alpha >= alpha_max_tab :
-            #Cálculo de los coeficientes de desprendimiento
-            CT_ds_mas = ((Cl_max_tab / math.cos(alpha_max_tab * Datos.pi / 180)) - (Cd_max_tab / math.sin(alpha_max_tab * Datos.pi / 180))) / ((math.sin(alpha_max_tab * Datos.pi / 180) / math.cos(alpha_max_tab * Datos.pi / 180)) + (math.cos(alpha_max_tab * Datos.pi / 180) / math.sin(alpha_max_tab * Datos.pi / 180)))
-            CN_ds_mas = (Cl_max_tab - (CT_ds_mas * math.sin(alpha_max_tab * Datos.pi / 180))) / (math.cos(alpha_max_tab * math.pi / 180))
-            f_mas = ((alpha - 45) / (alpha_max_tab - 45)) ** 2
-            Log10 = math.log(Re) / math.log(10)
-            CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-            #Coeficientes de separación
-            CN_sep = (CD_90) * ((math.sin(45 * Datos.pi / 180)) + 0.0023 * (math.sin(2 * 45 * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(45 * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(45 * math.pi / 180)) ** 8))))
-            CT_sep = (CD_90) * 0.3 * t_c * (abs(math.sin(45 * Datos.pi / 180) + 0.1 * math.sin(2 * 45 * Datos.pi / 180))) * (1 - 2 * math.cos(45 * Datos.pi / 180)) - CD_f * math.cos(45 * Datos.pi / 180)
-            #Cálculo del coeficiente de la normal y de la tangencial por interpolación según Lorenzo Battisti
-            CN_mas = CN_ds_mas * f_mas + CN_sep * (1 - f_mas)
-            CT_mas = CT_ds_mas * f_mas + CT_sep * (1 - f_mas)
-            #Coeficientes de sustentación y resistencia
-            Cl_2 = CN_mas * math.cos(alpha * Datos.pi / 180) + CT_mas * math.sin(alpha * Datos.pi / 180)
-            Cd_2 = (CN_mas * math.sin(alpha * Datos.pi / 180) - CT_mas * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-            
-    return Cl_1,Cl_2,Cd_1,Cd_2
 
+        if T < 0:
+            T = 0
+            Q = 0
 
+    W = Q * Datos.omega
 
+    ultimo_T = T
+    ultimo_Beta = Beta
 
-
-
-
-if alpha < alpha_min_tab : #alpha menor que el mínimo tabulado
-        #Cálculo de parámetros
-        CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
-        CD_270 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c - 1.39 * h_c
-        beta_prim = alpha - alphazero * math.cos(alpha * Datos.pi / 180)
-        CD_func = (CD_90 + CD_270)/2 + ((CD_90 - CD_270) / 2) * math.sin(beta_prim * Datos.pi / 180)
-        Log10 = math.log(Re) / math.log(10)
-        CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-        #Cálculo del coeficiente de la normal y de la tangencial de la Polar
-        CN = (CD_func) * ((math.sin(alpha * Datos.pi / 180)) + 0.0023 * (math.sin(2 * alpha * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(alpha * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(alpha * math.pi / 180)) ** 8))))
-        CT = (CD_func) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
-        #Cálculo de los coeficientes de sustentación y arrastre
-        Cl = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-        if alpha >= -45 and alpha <= alpha_min_tab :
-            #Cálculo de los coeficientes de desprendimiento
-            CT_ds_menos = ((Cl_min_tab / math.cos(alpha_min_tab * Datos.pi / 180)) - (Cd_min_tab / math.sin(alpha_min_tab * Datos.pi / 180))) / ((math.sin(alpha_min_tab * Datos.pi / 180) / math.cos(alpha_min_tab * Datos.pi / 180)) + (math.cos(alpha_min_tab * Datos.pi / 180) / math.sin(alpha_min_tab * Datos.pi / 180)))
-            CN_ds_menos = (Cl_min_tab - (CT_ds_menos * math.sin(alpha_min_tab * Datos.pi / 180))) / (math.cos(alpha_min_tab * math.pi / 180))
-            beta_prim = -45 - alphazero * math.cos(-45 * Datos.pi / 180)
-            CD_func = (CD_90 + CD_270)/2 + ((CD_90 - CD_270) / 2) * math.sin(beta_prim * Datos.pi / 180)
-            f_menos = ((alpha + 45) / (alpha_min_tab + 45)) ** 2
-            Log10 = math.log(Re) / math.log(10)
-            CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-            #Coeficientes de separación
-            CN_sep = (CD_func) * ((math.sin(-45 * Datos.pi / 180)) + 0.0023 * (math.sin(2 * -45 * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(-45 * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(-45 * math.pi / 180)) ** 8))))
-            CT_sep = (CD_func) * 0.3 * t_c * (abs(math.sin(-45 * Datos.pi / 180) + 0.1 * math.sin(2 * -45 * Datos.pi / 180))) * (1 - 2 * math.cos(-45 * Datos.pi / 180)) - CD_f * math.cos(-45 * Datos.pi / 180)
-            #Cálculo del coeficiente de la normal y de la tangencial por interpolación según Lorenzo Battisti
-            CN_menos = CN_ds_menos * f_menos + CN_sep * (1 - f_menos)
-            CT_menos = CT_ds_menos * f_menos + CT_sep * (1 - f_menos)
-            #Coeficientes de sustentación y resistencia
-            Cl = CN_menos * math.cos(alpha * Datos.pi / 180) + CT_menos * math.sin(alpha * Datos.pi / 180)
-            Cd = (CN_menos * math.sin(alpha * Datos.pi / 180) - CT_menos * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-            
-    else:  #alpha mayor que el máximo tabulado
-        #Cálculo de parámetros
-        CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
-        CD_270 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c - 1.39 * h_c
-        beta_prim = alpha - alphazero * math.cos(alpha * Datos.pi / 180)
-        CD_func = (CD_90 + CD_270)/2 + ((CD_90 - CD_270) / 2) * math.sin(beta_prim * Datos.pi / 180)
-        Log10 = math.log(Re) / math.log(10)
-        CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-        #Cálculo del coeficiente de la normal y de la tangencial de la Polar
-        CN = (CD_func) * ((math.sin(alpha * Datos.pi / 180)) + 0.0023 * (math.sin(2 * alpha * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(alpha * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(alpha * math.pi / 180)) ** 8))))
-        CT = (CD_func) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
-        #Cálculo de los coeficientes de sustentación y arrastre
-        Cl = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-        if alpha <= 45 and alpha >= alpha_max_tab :
-            #Cálculo de los coeficientes de desprendimiento
-            CT_ds_mas = ((Cl_max_tab / math.cos(alpha_max_tab * Datos.pi / 180)) - (Cd_max_tab / math.sin(alpha_max_tab * Datos.pi / 180))) / ((math.sin(alpha_max_tab * Datos.pi / 180) / math.cos(alpha_max_tab * Datos.pi / 180)) + (math.cos(alpha_max_tab * Datos.pi / 180) / math.sin(alpha_max_tab * Datos.pi / 180)))
-            CN_ds_mas = (Cl_max_tab - (CT_ds_mas * math.sin(alpha_max_tab * Datos.pi / 180))) / (math.cos(alpha_max_tab * math.pi / 180))
-            f_mas = ((alpha - 45) / (alpha_max_tab - 45)) ** 2
-            beta_prim = 45 - alphazero * math.cos(45 * Datos.pi / 180)
-            CD_func = (CD_90 + CD_270)/2 + ((CD_90 - CD_270) / 2) * math.sin(beta_prim * Datos.pi / 180)
-            Log10 = math.log(Re) / math.log(10)
-            CD_f = (0.455 / (Log10 ** 2.58)) - (1700 / Re)
-            #Coeficientes de separación
-            CN_sep = (CD_func) * ((math.sin(45 * Datos.pi / 180)) + 0.0023 * (math.sin(2 * 45 * Datos.pi / 180)) / (0.38 + (0.62 * abs((math.sin(45 * Datos.pi / 180)))) + (3.7 * t_c * ((math.cos(45 * math.pi / 180)) ** 8))))
-            CT_sep = (CD_func) * 0.3 * t_c * (abs(math.sin(45 * Datos.pi / 180) + 0.1 * math.sin(2 * 45 * Datos.pi / 180))) * (1 - 2 * math.cos(45 * Datos.pi / 180)) - CD_f * math.cos(45 * Datos.pi / 180)
-            #Cálculo del coeficiente de la normal y de la tangencial por interpolación según Lorenzo Battisti
-            CN_mas = CN_ds_mas * f_mas + CN_sep * (1 - f_mas)
-            CT_mas = CT_ds_mas * f_mas + CT_sep * (1 - f_mas)
-            #Coeficientes de sustentación y resistencia
-            Cl = CN_mas * math.cos(alpha * Datos.pi / 180) + CT_mas * math.sin(alpha * Datos.pi / 180)
-            Cd = (CN_mas * math.sin(alpha * Datos.pi / 180) - CT_mas * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
-
-    return Cl, Cd
+    return  T, Q, W """

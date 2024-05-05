@@ -132,8 +132,8 @@ def Interpolate_Extrapolate(alpha,Re):
 #Cl y Cd corregidos según la influencia del número de Mach
 def Cl_Cd_corregido(alpha, Cl, Cd, Mach):
 
-    transonic = False
-    supersonic = False
+    transonico = False
+    supersonico = False
 
     df_airfoil = pd.read_csv(Datos.archivo_csv)
     espesor = Camber_Module.thickness_max(df_airfoil)

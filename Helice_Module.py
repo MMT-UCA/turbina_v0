@@ -11,15 +11,6 @@ import csv
 
 #-----------------------------------------------------------------#
 
-#LLAMA_HÉLICE
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-
-# Lee los datos desde el archivo CSV (carga_Cl_Cd)
-df_1 = pd.read_csv(Datos.url_Re50000, skiprows=10)
-df_2 = pd.read_csv(Datos.url_Re100000, skiprows=10)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 #FUNCIONES
 
 def Temp(Z) :
@@ -110,7 +101,7 @@ def velocidades_inducidas(r,T_anterior,Beta_rad,C):
 #HÉLICE
 
 def helice(C,Beta):
-
+    
     rhoz = rho(Datos.Z)
     Tempe = Temp(Datos.Z)
     Presi = Pres(Datos.Z) * 1000
@@ -121,7 +112,7 @@ def helice(C,Beta):
 
     j = 0
     #Bucle
-    while abs(T - T_anterior) >= 0.1 and j <= 150:
+    while abs(T - T_anterior) >= 0.01 and j <= 200:
         T_anterior = T
         T = 0
         Q = 0
@@ -160,75 +151,289 @@ def helice(C,Beta):
         T = Datos.Palas * 0.5 * Datos.cuerda * rhoz * T
         Q = Datos.Palas * 0.5 * Datos.cuerda * rhoz * Q
         j += 1 
-    if j >= 200:
-        if T - T_anterior <=300:
+    if j > 200:
+        if abs(T - T_anterior) <=300:
             T = (T + T_anterior)/2
             Q = Q
         else:
             T = 0
             Q = 0
+    
 
     if T < 0:
         T = 0
+        Q = 0
 
     W = Q * Datos.omega
 
     return  T, Q, W
 
 #-----------------------------------------------------------------#
-#Crear .csv, tabla de datos de Tracción f(Beta,C)
+#CSV
+#Crea archivos csv de: T-C, W-C, eta-C, Ct-J, Cp-J
 
-""" def crear_csv(datos, nombre_archivo):
+def csv_complete():
 
-    with open(nombre_archivo, 'w', newline='') as archivo_csv:
-        escritor_csv = csv.writer(archivo_csv)
-        for fila in datos:
-            escritor_csv.writerow(fila)
+    #T vs C
+    def crear_csv(datos, nombre_archivo):
 
-# Ejemplo de uso
-datos = [
-    ['Nombre', 'Edad', 'Profesión'],
-    ['Juan', 30, 'Ingeniero'],
-    ['María', 25, 'Doctora'],
-    ['Luis', 35, 'Abogado']
-]
+        with open(nombre_archivo, 'w', newline='') as archivo_csv:
+            escritor_csv = csv.writer(archivo_csv)
 
-nombre_archivo = 'ejemplo.csv'
-crear_csv(datos, nombre_archivo)
-print(f"Se ha creado el archivo CSV '{nombre_archivo}'.") """
+            encabezados = ['C', 'T(B=10°)', 'T(B=20°)', 'T(B=30°)', 'T(B=40°)', 'T(B=50°)', 'T(B=60°)', 'T(B=70°)', 'T(B=80°)']
+            escritor_csv.writerow(encabezados)
+
+            for C, valores in datos.items():
+                fila = [C]
+                for valor in valores:
+                    fila.append(valor)
+                escritor_csv.writerow(fila)
+    
+    #W vs C
+    def crear_csv_W(datos, nombre_archivo):
+
+        with open(nombre_archivo, 'w', newline='') as archivo_csv:
+            escritor_csv = csv.writer(archivo_csv)
+
+            encabezados = ['C', 'W(B=10°)', 'W(B=20°)', 'W(B=30°)', 'W(B=40°)', 'W(B=50°)', 'W(B=60°)', 'W(B=70°)', 'W(B=80°)']
+            escritor_csv.writerow(encabezados)
+
+            for C, valores in datos.items():
+                fila = [C]
+                for valor in valores:
+                    fila.append(valor)
+                escritor_csv.writerow(fila)
+    
+    #Eta vs C
+    def crear_csv_eta(datos, nombre_archivo):
+
+        with open(nombre_archivo, 'w', newline='') as archivo_csv:
+            escritor_csv = csv.writer(archivo_csv)
+
+            encabezados = ['C', 'eta(B=10°)', 'eta(B=20°)', 'eta(B=30°)', 'eta(B=40°)', 'eta(B=50°)', 'eta(B=60°)', 'eta(B=70°)', 'eta(B=80°)']
+            escritor_csv.writerow(encabezados)
+
+            for C, valores in datos.items():
+                fila = [C]
+                for valor in valores:
+                    fila.append(valor)
+                escritor_csv.writerow(fila)
+    
+    #Ct vs J
+    def crear_csv_Ct(datos, nombre_archivo):
+
+        with open(nombre_archivo, 'w', newline='') as archivo_csv:
+            escritor_csv = csv.writer(archivo_csv)
+
+            encabezados = ['J', 'Ct(B=10°)', 'Ct(B=20°)', 'Ct(B=30°)', 'Ct(B=40°)', 'Ct(B=50°)', 'Ct(B=60°)', 'Ct(B=70°)', 'Ct(B=80°)']
+            escritor_csv.writerow(encabezados)
+
+            for J, valores in datos.items():
+                fila = [J]
+                for valor in valores:
+                    fila.append(valor)
+                escritor_csv.writerow(fila)
+    
+    #Cp vs J
+    def crear_csv_Cp(datos, nombre_archivo):
+
+        with open(nombre_archivo, 'w', newline='') as archivo_csv:
+            escritor_csv = csv.writer(archivo_csv)
+
+            encabezados = ['J', 'Cp(B=10°)', 'Cp(B=20°)', 'Cp(B=30°)', 'Cp(B=40°)', 'Cp(B=50°)', 'Cp(B=60°)', 'Cp(B=70°)', 'Cp(B=80°)']
+            escritor_csv.writerow(encabezados)
+
+            for J, valores in datos.items():
+                fila = [J]
+                for valor in valores:
+                    fila.append(valor)
+                escritor_csv.writerow(fila)
+
+
+    datos_T:map = {}
+    datos_W:map = {}
+    datos_eta:map = {}
+    datos_Ct:map = {}
+    datos_Cp:map = {}
+
+    betas = [10, 20, 30, 40, 50, 60, 70, 80]
+
+    for Beta in betas:
+        values_T:list = []
+        values_W:list = []
+        values_eta:list = []
+        values_Ct:list = []
+        values_Cp:list = []
+        T_ant = 1
+        for C in range(0, 401):
+            print(Beta, C)
+            J = C/(Datos.RPS * Datos.D)
+            if T_ant != 0:
+                T, Q, W = helice(C, Beta)
+                T_ant = T
+            else:
+                T = 0
+                W = 0
+            rhoz = rho(Datos.Z)
+            Ct = T/(rhoz*((Datos.RPS)**2)*((Datos.D)**4))
+            Cp = W/(rhoz*((Datos.RPS)**3)*((Datos.D)**5))
+            if Ct == 0:
+                eta = 0
+            else:
+                eta = (Ct*J)/Cp
+            values_T.append([C, T])
+            values_W.append([C, W])
+            values_Ct.append([J,Ct])
+            values_Cp.append([J,Cp])
+            values_eta.append([C,eta])
+            if C not in datos_T:
+                datos_T[C] = [T]
+            else:
+                datos_T[C].append(T)
+            if C not in datos_W:
+                datos_W[C] = [W]
+            else:
+                datos_W[C].append(W)
+            if J not in datos_Ct:
+                datos_Ct[J] = [Ct]
+            else:
+                datos_Ct[J].append(Ct)
+            if J not in datos_Cp:
+                datos_Cp[J] = [Cp]
+            else:
+                datos_Cp[J].append(Cp)
+            if C not in datos_eta:
+                datos_eta[C] = [eta]
+            else:
+                datos_eta[C].append(eta)
+
+
+    nombre_archivo_T = 'T_C.csv'
+    crear_csv(datos_T, nombre_archivo_T)
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_T}'.")
+    nombre_archivo_W = 'W_C.csv'
+    crear_csv_W(datos_W, nombre_archivo_W)
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_W}'.")
+    nombre_archivo_eta = 'eta_C.csv'
+    crear_csv_eta(datos_eta, nombre_archivo_eta)
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_eta}'.")
+    nombre_archivo_Ct = 'Ct_J.csv'
+    crear_csv_Ct(datos_Ct, nombre_archivo_Ct)
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_Ct}'.")
+    nombre_archivo_Cp = 'Cp_J.csv'
+    crear_csv_Cp(datos_Cp, nombre_archivo_Cp)
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_Cp}'.")
 
 #-----------------------------------------------------------------#
 
 #PLOT
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+#Plot sin el csv
 
-""" betas = [10, 20, 30, 40, 50, 60]
-colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
+def plot_sincsv():
 
-for Beta, color in zip(betas, colores):
-    valores_T = []
-    valores_C = []
+    betas = [10, 20, 30, 40, 50, 60]
+    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
 
-    for C in range(0, 201):
-        T, Q, W = helice(C,Beta)
-        print('Beta,C,T:', Beta, C, T)
-        valores_T.append(T)
-        valores_C.append(C)
+    for Beta, color in zip(betas, colores):
+        valores_T = []
+        valores_C = []
 
-    plt.scatter(valores_C, valores_T,label=f'Beta = {Beta}', color=color)
+        for C in range(0, 401):
+            T, Q, W = helice(C,Beta)
+            print('Beta,C,T:', Beta, C, T)
+            valores_T.append(T)
+            valores_C.append(C)
+
+        plt.scatter(valores_C, valores_T,label=f'Beta = {Beta}', color=color)
 
 
-plt.xlabel('C')
-plt.ylabel('T')
-plt.title('T vs C')
+    plt.xlabel('C')
+    plt.ylabel('T')
+    plt.title('T vs C')
 
-plt.legend()
+    plt.legend()
 
-plt.show() """
+    plt.show()
+
+
+#-----------------------------------------------------------------#
+#Plot con el csv
+#T
+def plot_T_C():
+
+    df = pd.read_csv(Datos.T_C_csv)
+    valores_C = df['C']
+
+    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
+    betas = [10, 20, 30, 40, 50, 60]
+
+    i = 1
+    for Beta, color in zip(betas, colores):
+        columna_T = f"T(B={Beta}°)"
+        valores_T = df[columna_T]
+        plt.plot(valores_C, valores_T,label=f'Beta = {Beta}', color=color)
+
+    plt.xlabel('C')
+    plt.ylabel('T')
+    plt.title('T vs C')
+
+    plt.legend()
+
+    plt.show()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+#W
+def plot_W_C():
+
+    df = pd.read_csv(Datos.W_C_csv)
+    valores_C = df['C']
+
+    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
+    betas = [10, 20, 30, 40, 50, 60]
+
+    i = 1
+    for Beta, color in zip(betas, colores):
+        columna_W = f"W(B={Beta}°)"
+        valores_W = df[columna_W]
+        plt.plot(valores_C, valores_W,label=f'Beta = {Beta}', color=color)
+
+    plt.xlabel('C')
+    plt.ylabel('W')
+    plt.title('W vs C')
+
+    plt.legend()
+
+    plt.show()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+#eta
+def plot_eta_C():
+
+    df = pd.read_csv(Datos.eta_C_csv)
+    valores_C = df['C']
+
+    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
+    betas = [10, 20, 30, 40, 50, 60]
+
+    i = 1
+    for Beta, color in zip(betas, colores):
+        columna_eta = f"eta(B={Beta}°)"
+        valores_eta = df[columna_eta]
+        plt.plot(valores_C, valores_eta,label=f'Beta = {Beta}', color=color)
+
+    plt.xlabel('C')
+    plt.ylabel('eta')
+    plt.title('eta vs C')
+
+    plt.legend()
+
+    plt.show()
 
 #-----------------------------------------------------------------#
 
 #PRUEBAS
+""" for C in range (213, 220, 1):
+    T, Q, W = helice(C, 50)
+    print('T,Q,W:', T, Q, W) """
 
-""" T, Q, W = helice(25, 30)
-
-print('T,Q,W:', T, Q, W) """

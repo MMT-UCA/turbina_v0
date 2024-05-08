@@ -102,7 +102,7 @@ for Mach in np.arange(0, 2 + 0.05, 0.05):
     factores.append(factor)
     valores_Mach.append(Mach)
     
-plt.scatter(valores_Mach, factores, color='red')
+plt.plot(valores_Mach, factores, color='red')
 
 plt.xlabel('Mach')
 plt.ylabel('Factor corrector')

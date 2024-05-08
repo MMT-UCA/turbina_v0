@@ -63,7 +63,7 @@ def interpolate_Cl(alpha,Re):
         Re_lower = 1000000
         Re_upper = 1000000
     else:
-        # Haz algo si ninguna de las condiciones anteriores se cumple
+        # Si ninguna de las condiciones anteriores se cumple
         print("Re no está en ninguno de los rangos especificados")
 
     x_list = df['Alpha']

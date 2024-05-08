@@ -1,3 +1,8 @@
+#-----------------------------------------------------------------#
+#MÓDULO CAMBER - THICKNESS
+#Módulo de cálculo de: curvatura, curvatura máxima, curvatura media, espesor y espesor máximo
+#-----------------------------------------------------------------#
+
 #IMPORTS
 
 import pandas as pd
@@ -6,7 +11,7 @@ import Datos
 import matplotlib.pyplot as plt
 
 #-----------------------------------------------------------------#
-#Interpolación lineal
+#Función de interpolación lineal
 def interpolate_fcn(x_1, y_1, x_2, y_2, x_3):
     if x_1 == x_2 :
         y_3 = y_1
@@ -84,7 +89,7 @@ def camber(df,x):
     return camber_value
 
 #-----------------------------------------------------------------#
-#h_c
+#h_c, curvatura máxima
 def camber_max(df):
 
     camber_values = []
@@ -130,7 +135,7 @@ def thickness(df,x):
     return thickness_value
 
 #-----------------------------------------------------------------#
-#t_c
+#t_c, espesor máximo
 def thickness_max(df):
 
     thickness_values = []
@@ -182,3 +187,4 @@ def plot_camber(df):
 camber_m = camber_med(df)
 
 print('Curvatura máxima:', camber_m)  """
+

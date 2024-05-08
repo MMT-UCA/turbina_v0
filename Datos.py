@@ -10,9 +10,9 @@ C_d = 0.02
 A_a = 16 #m^2
 C_crucero = 593 #km/h
 dt = 1 #s
-dt_acel = 10 #s
-t_fin = 10 #s
-t_fin_acel = 400 #s
+dt_acel = 1 #s
+t_fin = 60 #s
+t_fin_acel = 10 #s
 Z = 0 #m
 C = 0
 x = 0
@@ -86,7 +86,6 @@ url_Re1000000="xf-naca2411-il-1000000.csv"
 #Coordenadas
 
 archivo_csv = "Coordenadas.csv"
-#/Users/albacrespogonzalez/Desktop/TFG/Python/
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
@@ -101,3 +100,7 @@ eta_C_csv = "eta_C.csv"
 Ct_J_csv = "Ct_J.csv"
 
 Cp_J_csv = "Cp_J.csv"
+
+resultados_principal_csv = "resultados_principal.csv"
+
+resultados_acel_max_csv = "resultados_acel_max.csv"

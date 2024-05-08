@@ -190,15 +190,14 @@ valores_alpha = []
 Re = 398465
 
 for alpha in range(-180, 180):
-    # Llama a tu función para calcular Cl y Cd
     Cl, Cd = Interpolate_Extrapolate(alpha,Re)
-    print('alpha,Cd:', alpha, Cd)
+    print('alpha,Cl:', alpha, Cl)
     # Agrega los valores a las listas correspondientes
     valores_Cl.append(Cl)
     valores_Cd.append(Cd)
     valores_alpha.append(alpha)
 
-plt.scatter(valores_alpha, valores_Cd, color='red')
+plt.plot(valores_alpha, valores_Cl, color='red')
 
 # Agrega etiquetas y título al gráfico
 plt.xlabel('α(°)')

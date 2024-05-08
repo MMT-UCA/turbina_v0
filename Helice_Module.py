@@ -1,4 +1,7 @@
 #-----------------------------------------------------------------#
+#MÓDULO HÉLICE
+#Cálculos de Tracción, Potencia, Rendimiento propulsivo
+#-----------------------------------------------------------------#
 #IMPORTS
 
 import math
@@ -10,9 +13,8 @@ import Interpolate_Extrapolate_Module
 import csv
 
 #-----------------------------------------------------------------#
-
 #FUNCIONES
-
+#Función cálculo Temperatura
 def Temp(Z) :
     if Z < 11000 :
         return 288.19 - 0.00649*Z
@@ -22,7 +24,7 @@ def Temp(Z) :
         return 141.94 + 0.00299*Z
     
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-
+#Función cálculo Presión
 def Pres(Z) :
     if Z < 11000 :
         return 101.29 * (Temp(Z) / 288.08) ** 5.256
@@ -30,9 +32,9 @@ def Pres(Z) :
         return 22.65 * math.exp(1.73 - 0.000157 * Z)
     else :
         return 2.488 * (Temp(Z) / 216.6) ** -11.388
-
+    
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-
+#Función cálculo Densidad
 def rho(Z) :
     return Pres(Z)/(0.287*Temp(Z))
 
@@ -266,7 +268,6 @@ def csv_complete():
         values_Cp:list = []
         T_ant = 1
         for C in range(0, 401):
-            print(Beta, C)
             J = C/(Datos.RPS * Datos.D)
             if T_ant != 0:
                 T, Q, W = helice(C, Beta)
@@ -436,4 +437,8 @@ def plot_eta_C():
 """ for C in range (213, 220, 1):
     T, Q, W = helice(C, 50)
     print('T,Q,W:', T, Q, W) """
+
+#plot_T_C()
+#plot_W_C()
+#plot_eta_C()
 

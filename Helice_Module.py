@@ -11,6 +11,8 @@ import Datos
 import CoolProp.CoolProp as CP
 import Interpolate_Extrapolate_Module
 import csv
+import numpy as np
+import Chord_Twist_Module
 
 #-----------------------------------------------------------------#
 #FUNCIONES
@@ -39,32 +41,6 @@ def rho(Z) :
     return Pres(Z)/(0.287*Temp(Z))
 
 #-----------------------------------------------------------------#
-
-#Torsión
-
-def Torsion():
-
-    alfa_rad = Datos.alfa_diseno * (Datos.pi / 180) #radianes
-    n = Datos.RPM / 60 #rps
-    C_crucero_ms = Datos.C_crucero *(1000/3600)
-
-    j = C_crucero_ms / (n * Datos.D)
-
-    #Beta variable con el radio (torsión)
-
-    Beta_crucero = [] # Definir Beta_crucero como una lista vacía
-
-    r = Datos.r_o
-    while r <= (Datos.D)/2:
-        valor = (math.atan(Datos.D * j / (2 * math.pi * r)) + alfa_rad) * (180 / math.pi)
-        Beta_crucero.append(valor)
-        r += Datos.dr
-
-    Beta_n_crucero = (math.atan(Datos.D * j / (2 * Datos.pi * 3 * Datos.D / 8)) + alfa_rad) * 180 / Datos.pi
-    return Beta_crucero, Beta_n_crucero
-
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
 #Velocidades inducidas
 def velocidades_inducidas(r,T_anterior,Beta_rad,C):
@@ -108,7 +84,8 @@ def helice(C,Beta):
     Tempe = Temp(Datos.Z)
     Presi = Pres(Datos.Z) * 1000
     Visc = CP.PropsSI("V", "T", Tempe, "P", Presi, "air")
-    Beta_crucero, Beta_n_crucero = Torsion()
+    Beta_crucero, Beta_n_crucero = Chord_Twist_Module.Torsion()
+    valor_cuerda, valor_cuerda_media = Chord_Twist_Module.cuerda()
     T = 0
     T_anterior = 1 
 
@@ -132,7 +109,7 @@ def helice(C,Beta):
             alfa_rad = Beta_rad - Phi_rad
             Phi_grad = Phi_rad * 180 / Datos.pi
             alfa = 180 * alfa_rad / Datos.pi
-            Re = rhoz * (C_Tcuad) ** 0.5 * Datos.cuerda / Visc
+            Re = rhoz * (C_Tcuad) ** 0.5 * valor_cuerda[i] / Visc
             #####Call Cl_Cd#####
             Cl, Cd = Interpolate_Extrapolate_Module.Interpolate_Extrapolate(alfa, Re)
 
@@ -150,8 +127,8 @@ def helice(C,Beta):
 
             i += 1
             r_vind += Datos.dr
-        T = Datos.Palas * 0.5 * Datos.cuerda * rhoz * T
-        Q = Datos.Palas * 0.5 * Datos.cuerda * rhoz * Q
+        T = Datos.Palas * 0.5 * valor_cuerda_media * rhoz * T
+        Q = Datos.Palas * 0.5 * valor_cuerda_media * rhoz * Q
         j += 1 
     if j > 200:
         if abs(T - T_anterior) <=300:
@@ -282,6 +259,7 @@ def csv_complete():
                 eta = 0
             else:
                 eta = (Ct*J)/Cp
+            print(C,Beta)
             values_T.append([C, T])
             values_W.append([C, W])
             values_Ct.append([J,Ct])
@@ -309,19 +287,19 @@ def csv_complete():
                 datos_eta[C].append(eta)
 
 
-    nombre_archivo_T = 'T_C.csv'
+    nombre_archivo_T = 'T_C_cuerdatorsion_var.csv'
     crear_csv(datos_T, nombre_archivo_T)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_T}'.")
-    nombre_archivo_W = 'W_C.csv'
+    nombre_archivo_W = 'W_C_cuerdatorsion_var.csv'
     crear_csv_W(datos_W, nombre_archivo_W)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_W}'.")
-    nombre_archivo_eta = 'eta_C.csv'
+    nombre_archivo_eta = 'eta_C_cuerdatorsion_var.csv'
     crear_csv_eta(datos_eta, nombre_archivo_eta)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_eta}'.")
-    nombre_archivo_Ct = 'Ct_J.csv'
+    nombre_archivo_Ct = 'Ct_J_cuerdatorsion_var.csv'
     crear_csv_Ct(datos_Ct, nombre_archivo_Ct)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_Ct}'.")
-    nombre_archivo_Cp = 'Cp_J.csv'
+    nombre_archivo_Cp = 'Cp_J_cuerdatorsion_var.csv'
     crear_csv_Cp(datos_Cp, nombre_archivo_Cp)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_Cp}'.")
 
@@ -333,14 +311,14 @@ def csv_complete():
 
 def plot_sincsv():
 
-    betas = [10, 20, 30, 40, 50, 60]
+    betas = [30, 40]
     colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
 
     for Beta, color in zip(betas, colores):
         valores_T = []
         valores_C = []
 
-        for C in range(0, 401):
+        for C in range(0, 101):
             T, Q, W = helice(C,Beta)
             print('Beta,C,T:', Beta, C, T)
             valores_T.append(T)
@@ -356,7 +334,6 @@ def plot_sincsv():
     plt.legend()
 
     plt.show()
-
 
 #-----------------------------------------------------------------#
 #Plot con el csv
@@ -434,11 +411,11 @@ def plot_eta_C():
 #-----------------------------------------------------------------#
 
 #PRUEBAS
-""" for C in range (213, 220, 1):
+""" for C in range (200, 220, 1):
     T, Q, W = helice(C, 50)
     print('T,Q,W:', T, Q, W) """
 
-#plot_T_C()
-#plot_W_C()
-#plot_eta_C()
+""" plot_T_C()
+plot_W_C()
+plot_eta_C() """
 

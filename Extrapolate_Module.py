@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import Datos
 import math
 import Camber_Module
+import Chord_Twist_Module
 
 #Extrapolación de la polar de Lorenzo Battisti et al https://doi.org/10.1016/j.renene.2020.03.15
 #-----------------------------------------------------------------#
@@ -78,6 +79,9 @@ def extrapolate_asymmetrical(df,df_airfoil,alpha,Re):
 
     alphazero = alpha_zero(df)
 
+    valor_cuerda, valor_cuerda_media = Chord_Twist_Module.cuerda()
+    AR = Datos.D / valor_cuerda_media
+
     if alpha < alpha_min_tab : #alpha menor que el mínimo tabulado
         #Cálculo de parámetros
         CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
@@ -91,7 +95,7 @@ def extrapolate_asymmetrical(df,df_airfoil,alpha,Re):
         CT = (CD_func) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
         #Cálculo de los coeficientes de sustentación y arrastre
         Cl = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
         if alpha >= -45 and alpha <= alpha_min_tab :
             #Cálculo de los coeficientes de desprendimiento
             CT_ds_menos = ((Cl_min_tab / math.cos(alpha_min_tab * Datos.pi / 180)) - (Cd_min_tab / math.sin(alpha_min_tab * Datos.pi / 180))) / ((math.sin(alpha_min_tab * Datos.pi / 180) / math.cos(alpha_min_tab * Datos.pi / 180)) + (math.cos(alpha_min_tab * Datos.pi / 180) / math.sin(alpha_min_tab * Datos.pi / 180)))
@@ -109,7 +113,7 @@ def extrapolate_asymmetrical(df,df_airfoil,alpha,Re):
             CT_menos = CT_ds_menos * f_menos + CT_sep * (1 - f_menos)
             #Coeficientes de sustentación y resistencia
             Cl = CN_menos * math.cos(alpha * Datos.pi / 180) + CT_menos * math.sin(alpha * Datos.pi / 180)
-            Cd = (CN_menos * math.sin(alpha * Datos.pi / 180) - CT_menos * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+            Cd = (CN_menos * math.sin(alpha * Datos.pi / 180) - CT_menos * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
             
     else:  #alpha mayor que el máximo tabulado
         #Cálculo de parámetros
@@ -124,7 +128,7 @@ def extrapolate_asymmetrical(df,df_airfoil,alpha,Re):
         CT = (CD_func) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
         #Cálculo de los coeficientes de sustentación y arrastre
         Cl = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
         if alpha <= 45 and alpha >= alpha_max_tab :
             #Cálculo de los coeficientes de desprendimiento
             CT_ds_mas = ((Cl_max_tab / math.cos(alpha_max_tab * Datos.pi / 180)) - (Cd_max_tab / math.sin(alpha_max_tab * Datos.pi / 180))) / ((math.sin(alpha_max_tab * Datos.pi / 180) / math.cos(alpha_max_tab * Datos.pi / 180)) + (math.cos(alpha_max_tab * Datos.pi / 180) / math.sin(alpha_max_tab * Datos.pi / 180)))
@@ -142,7 +146,7 @@ def extrapolate_asymmetrical(df,df_airfoil,alpha,Re):
             CT_mas = CT_ds_mas * f_mas + CT_sep * (1 - f_mas)
             #Coeficientes de sustentación y resistencia
             Cl = CN_mas * math.cos(alpha * Datos.pi / 180) + CT_mas * math.sin(alpha * Datos.pi / 180)
-            Cd = (CN_mas * math.sin(alpha * Datos.pi / 180) - CT_mas * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+            Cd = (CN_mas * math.sin(alpha * Datos.pi / 180) - CT_mas * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
 
     return Cl, Cd
 
@@ -163,6 +167,9 @@ def extrapolate_symmetrical(df,df_airfoil,alpha,Re):
     t_c = Camber_Module.thickness_max(df_airfoil)
     h_c = Camber_Module.camber_max(df_airfoil)
 
+    valor_cuerda, valor_cuerda_media = Chord_Twist_Module.cuerda()
+    AR = Datos.D / valor_cuerda_media
+
     if alpha < alpha_min_tab : #alpha menor que el mínimo tabulado
         #Cálculo de parámetros
         CD_90 = 1.98 - 0.64 * (0.5 * (t_c)**2) - 0.44 * t_c + 1.39 * h_c
@@ -173,7 +180,7 @@ def extrapolate_symmetrical(df,df_airfoil,alpha,Re):
         CT = (CD_90) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
         #Cálculo de los coeficientes de sustentación y arrastre
         Cl = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
         if alpha >= -45 and alpha <= alpha_min_tab :
             #Cálculo de los coeficientes de desprendimiento
             CT_ds_menos = ((Cl_min_tab / math.cos(alpha_min_tab * Datos.pi / 180)) - (Cd_min_tab / math.sin(alpha_min_tab * Datos.pi / 180))) / ((math.sin(alpha_min_tab * Datos.pi / 180) / math.cos(alpha_min_tab * Datos.pi / 180)) + (math.cos(alpha_min_tab * Datos.pi / 180) / math.sin(alpha_min_tab * Datos.pi / 180)))
@@ -189,7 +196,7 @@ def extrapolate_symmetrical(df,df_airfoil,alpha,Re):
             CT_menos = CT_ds_menos * f_menos + CT_sep * (1 - f_menos)
             #Coeficientes de sustentación y resistencia
             Cl = CN_menos * math.cos(alpha * Datos.pi / 180) + CT_menos * math.sin(alpha * Datos.pi / 180)
-            Cd = (CN_menos * math.sin(alpha * Datos.pi / 180) - CT_menos * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+            Cd = (CN_menos * math.sin(alpha * Datos.pi / 180) - CT_menos * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
             
     else:  #alpha mayor que el máximo tabulado
         #Cálculo de parámetros
@@ -201,7 +208,7 @@ def extrapolate_symmetrical(df,df_airfoil,alpha,Re):
         CT = (CD_90) * 0.3 * t_c * (abs(math.sin(alpha * Datos.pi / 180) + 0.1 * math.sin(2 * alpha * Datos.pi / 180))) * (1 - 2 * math.cos(alpha * Datos.pi / 180)) - CD_f * math.cos(alpha * Datos.pi / 180)
         #Cálculo de los coeficientes de sustentación y arrastre
         Cl = CN * math.cos(alpha * Datos.pi / 180) + CT * math.sin(alpha * Datos.pi / 180)
-        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+        Cd = (CN * math.sin(alpha * Datos.pi / 180) - CT * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
         if alpha <= 45 and alpha >= alpha_max_tab :
             #Cálculo de los coeficientes de desprendimiento
             CT_ds_mas = ((Cl_max_tab / math.cos(alpha_max_tab * Datos.pi / 180)) - (Cd_max_tab / math.sin(alpha_max_tab * Datos.pi / 180))) / ((math.sin(alpha_max_tab * Datos.pi / 180) / math.cos(alpha_max_tab * Datos.pi / 180)) + (math.cos(alpha_max_tab * Datos.pi / 180) / math.sin(alpha_max_tab * Datos.pi / 180)))
@@ -217,7 +224,7 @@ def extrapolate_symmetrical(df,df_airfoil,alpha,Re):
             CT_mas = CT_ds_mas * f_mas + CT_sep * (1 - f_mas)
             #Coeficientes de sustentación y resistencia
             Cl = CN_mas * math.cos(alpha * Datos.pi / 180) + CT_mas * math.sin(alpha * Datos.pi / 180)
-            Cd = (CN_mas * math.sin(alpha * Datos.pi / 180) - CT_mas * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (Datos.AR / (math.sin(alpha * Datos.pi / 180))))))
+            Cd = (CN_mas * math.sin(alpha * Datos.pi / 180) - CT_mas * math.cos(alpha * Datos.pi / 180)) * (1 - 0.4 * (1 - math.exp(-(11.4) / (AR/ (math.sin(alpha * Datos.pi / 180))))))
 
     return Cl, Cd
 

@@ -30,16 +30,27 @@ pi = 3.141592654
 Beta = 60 #°
 D = 2.2 #m
 r_o = 0.15 #m
-cuerda = 0.1 #m
 RPM = 2000 
 RPS = RPM/60 #equivalente a n de Excel
-AR = D/cuerda
+#AR = D/cuerda
 Palas = 5 
 dr = 0.1 #m
 
 error_helice = 0.1
 omega = 2*pi*RPS
 Ah = pi*(D**2)/4
+
+#CUERDA
+
+#Si la cuerda es variable indicar True y proporcionar .csv con los datos de cuerda (radio, cuerda), 
+#el primer valor de radio deberá ser r_o indicado anteriormente, y el último D/2
+#Si la cuerda no varía indicar False, e indicar el valor de cuerda_fija
+
+cuerda_variable = True
+
+cuerda_csv = "datos_cuerda_2.csv"
+
+cuerda_fija = 0.1 #m
 
 #-----------------------------------------------------------------#
 
@@ -52,6 +63,14 @@ n_vind = 0.2
 #-----------------------------------------------------------------#
 
 #DATOS TORSIÓN
+
+#Si la torsión es variable indicar True y proporcionar .csv con los datos de torsión (radio, Beta), 
+#el primer valor de radio deberá ser r_o indicado anteriormente, y el último D/2
+#Si la torsión no varía indicar False
+
+torsion_variable = True
+
+torsion_csv = "datos_torsion_2.csv"
 
 alfa_diseno = 5 #°
 
@@ -91,16 +110,15 @@ archivo_csv = "Coordenadas.csv"
 
 #Resultados
 
-T_C_csv = "T_C.csv"
+T_C_csv = "T_C_cuerdatorsion_var.csv"
 
-W_C_csv = "W_C.csv"
+W_C_csv = "W_C_cuerdatorsion_var.csv"
 
-eta_C_csv = "eta_C.csv"
+eta_C_csv = "eta_C_cuerdatorsion_var.csv"
 
-Ct_J_csv = "Ct_J.csv"
+Ct_J_csv = "Ct_J_cuerdatorsion_var.csv"
 
-Cp_J_csv = "Cp_J.csv"
+Cp_J_csv = "Cp_J_cuerdatorsion_var.csv"
 
 resultados_principal_csv = "resultados_principal.csv"
 
-resultados_acel_max_csv = "resultados_acel_max.csv"

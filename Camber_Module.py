@@ -186,5 +186,5 @@ def plot_camber(df):
 
 camber_m = camber_med(df)
 
-print('Curvatura máxima:', camber_m)  """
+print('Curvatura máxima:', camber_m) """
 

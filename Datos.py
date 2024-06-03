@@ -76,7 +76,61 @@ alfa_diseno = 5 #°
 
 #-----------------------------------------------------------------#
 
-#URLs
+#DATOS PERFIL VARIABLE
+
+#Si el perfil es variable indicar True y 
+#Si el perfil no varía indicar False y el archivo de coordenadas correspondiente en archivo_csv
+
+perfil_variable = True
+
+#Perfil variable
+archivo_csv_variable = "Coordenadas_perfilvariable.csv"
+
+#Perfil fijo
+archivo_csv = "Coordenadas.csv"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+#URLs PERFIL VARIABLE
+
+#NACA 0010
+coordenadasNACA0010 = "Coordenadas_NACA0010.csv"
+url__NACA0010_Re50000="Archivos_NACA/xf-naca0010-il-50000.csv"
+url__NACA0010_Re100000 = "Archivos_NACA/xf-naca0010-il-100000.csv"
+url__NACA0010_Re200000 = "Archivos_NACA/xf-naca0010-il-200000.csv"
+url__NACA0010_Re500000 = "Archivos_NACA/xf-naca0010-il-500000.csv"
+url__NACA0010_Re1000000 = "Archivos_NACA/xf-naca0010-il-1000000.csv"
+
+#NACA 0012
+coordenadasNACA0012 = "Coordenadas_NACA0012.csv"
+url__NACA0012_Re50000 = "Archivos_NACA/xf-naca0012-il-50000.csv"
+url__NACA0012_Re100000 = "Archivos_NACA/xf-naca0012-il-100000.csv"
+url__NACA0012_Re200000 = "Archivos_NACA/xf-naca0012-il-200000.csv"
+url__NACA0012_Re500000 = "Archivos_NACA/xf-naca0012-il-500000.csv"
+url__NACA0012_Re1000000 = "Archivos_NACA/xf-naca0012-il-1000000.csv"
+
+
+#NACA 2414
+coordenadasNACA2414 = "Coordenadas_NACA2414.csv"
+url__NACA2414_Re50000 = "Archivos_NACA/xf-naca2414-il-50000.csv"
+url__NACA2414_Re100000 = "Archivos_NACA/xf-naca2414-il-100000.csv"
+url__NACA2414_Re200000 = "Archivos_NACA/xf-naca2414-il-200000.csv"
+url__NACA2414_Re500000 = "Archivos_NACA/xf-naca2414-il-500000.csv"
+url__NACA2414_Re1000000 = "Archivos_NACA/xf-naca2414-il-1000000.csv"
+
+
+#NACA 2415
+coordenadasNACA2415 = "Coordenadas_NACA2415.csv"
+url__NACA2415_Re50000 = "Archivos_NACA/xf-naca2415-il-50000.csv"
+url__NACA2415_Re100000 = "Archivos_NACA/xf-naca2415-il-100000.csv"
+url__NACA2415_Re200000 = "Archivos_NACA/xf-naca2415-il-200000.csv"
+url__NACA2415_Re500000 = "Archivos_NACA/xf-naca2415-il-500000.csv"
+url__NACA2415_Re1000000 = "Archivos_NACA/xf-naca2415-il-1000000.csv"
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+#URLs PERFIL FIJO
 
 #Re50000
 
@@ -106,7 +160,7 @@ url_Re1000000="xf-naca2411-il-1000000.csv"
 
 archivo_csv = "Coordenadas.csv"
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+#-----------------------------------------------------------------#
 
 #Resultados
 

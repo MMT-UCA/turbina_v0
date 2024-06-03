@@ -180,11 +180,5 @@ def plot_camber(df):
 
 #-----------------------------------------------------------------#
 
-# PRUEBAS
 
-""" df = pd.read_csv(Datos.archivo_csv)
-
-camber_m = camber_med(df)
-
-print('Curvatura máxima:', camber_m) """
 

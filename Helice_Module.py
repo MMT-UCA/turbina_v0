@@ -88,6 +88,7 @@ def helice(C,Beta):
     valor_cuerda, valor_cuerda_media = Chord_Twist_Module.cuerda()
     T = 0
     T_anterior = 1 
+    perfil_variable = Datos.perfil_variable
 
     j = 0
     #Bucle
@@ -111,13 +112,13 @@ def helice(C,Beta):
             alfa = 180 * alfa_rad / Datos.pi
             Re = rhoz * (C_Tcuad) ** 0.5 * valor_cuerda[i] / Visc
             #####Call Cl_Cd#####
-            Cl, Cd = Interpolate_Extrapolate_Module.Interpolate_Extrapolate(alfa, Re)
+            Cl, Cd = Interpolate_Extrapolate_Module.Interpolate_Extrapolate(alfa, Re,r_vind,perfil_variable)
 
             #Cálculo de Mach
             A_sonido = CP.PropsSI("A", "T", Tempe, "P", Presi, "air")
             Mach = ((C_Tcuad) ** 0.5) / A_sonido
             #####Call Cl_Cd corregido#####
-            Cl_corregido, Cd_corregido, transonico, supersonico = Interpolate_Extrapolate_Module.Cl_Cd_corregido(alfa,Cl,Cd,Mach)
+            Cl_corregido, Cd_corregido, transonico, supersonico = Interpolate_Extrapolate_Module.Cl_Cd_corregido(alfa,Cl,Cd,Mach,r_vind,perfil_variable)
 
             #Cálculo de tracción y potencia
             dTrac = C_Tcuad * (Cl_corregido * math.cos(Phi_rad) - Cd_corregido * math.sin(Phi_rad)) * Datos.dr
@@ -411,9 +412,9 @@ def plot_eta_C():
 #-----------------------------------------------------------------#
 
 #PRUEBAS
-""" for C in range (200, 220, 1):
+for C in range (0, 220, 1):
     T, Q, W = helice(C, 50)
-    print('T,Q,W:', T, Q, W) """
+    print('T,Q,W:', T, Q, W)
 
 """ plot_T_C()
 plot_W_C()

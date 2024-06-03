@@ -11,24 +11,25 @@ import Interpolate_Module
 import Datos
 import Camber_Module
 import Factor_Corrector_Module
+import Airfoil_Module
 
 #-----------------------------------------------------------------#
 #Función que calcula Cl y Cd para Re = [50000, 100000, 200000, 500000, 1000000]
-def Interpolate_Extrapolate_Re(alpha,Re):
+def Interpolate_Extrapolate_Re(alpha,Re,r,perfil_variable):
     # Re listado
 
-    df_airfoil = pd.read_csv(Datos.archivo_csv)
+    df_airfoil = Airfoil_Module.coordenadas_perfil(r,perfil_variable)
 
     if Re == 50000:
-        df = pd.read_csv(Datos.url_Re50000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,Re)
     if Re == 100000:
-        df = pd.read_csv(Datos.url_Re100000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,Re)
     if Re == 200000:
-        df = pd.read_csv(Datos.url_Re200000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,Re)
     if Re == 500000:
-        df = pd.read_csv(Datos.url_Re500000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,Re)
     if Re == 1000000:
-        df = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,Re)
 
     alpha_column = df['Alpha']
     alpha_min_tab = alpha_column.iloc[1]
@@ -43,8 +44,8 @@ def Interpolate_Extrapolate_Re(alpha,Re):
         return  Cl, Cd # Devolver el dato exacto
     if alpha_min_tab < alpha < alpha_max_tab:
         # Alpha dentro de los límites, realizar interpolación
-        Cl = Interpolate_Module.interpolate_Cl(alpha,Re)
-        Cd = Interpolate_Module.interpolate_Cd(alpha,Re)
+        Cl = Interpolate_Module.interpolate_Cl(alpha,Re,r,perfil_variable)
+        Cd = Interpolate_Module.interpolate_Cd(alpha,Re,r,perfil_variable)
         return Cl, Cd
     else:
         # Alpha fuera de los límites, realizar extrapolación
@@ -59,9 +60,9 @@ def Interpolate_Extrapolate_Re(alpha,Re):
 
 #-----------------------------------------------------------------#
 #Función principal, calcula Cl y Cd para Re ≠ [50000, 100000, 200000, 500000, 1000000]
-def Interpolate_Extrapolate(alpha,Re):
+def Interpolate_Extrapolate(alpha,Re,r,perfil_variable):
 
-    df_airfoil = pd.read_csv(Datos.archivo_csv)
+    df_airfoil = Airfoil_Module.coordenadas_perfil(r,perfil_variable)
 
     if Re in [50000, 100000, 200000, 500000, 1000000]:
         Cl, Cd = Interpolate_Extrapolate_Re(alpha,Re)
@@ -69,73 +70,73 @@ def Interpolate_Extrapolate(alpha,Re):
         if 50000 < Re < 100000:
             Re_lower = 50000
             Re_upper = 100000
-            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower)
-            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper)
+            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower,r,perfil_variable)
+            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper,r,perfil_variable)
             Cl = Interpolate_Module.interpolate_fcn(Re_lower,Cl_lower,Re_upper,Cl_upper,Re)
             Cd = Interpolate_Module.interpolate_fcn(Re_lower,Cd_lower,Re_upper,Cd_upper,Re)
         if 100000 < Re < 200000:
             Re_lower = 100000
             Re_upper = 200000
-            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower)
-            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper)
+            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower,r,perfil_variable)
+            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper,r,perfil_variable)
             Cl = Interpolate_Module.interpolate_fcn(Re_lower,Cl_lower,Re_upper,Cl_upper,Re)
             Cd = Interpolate_Module.interpolate_fcn(Re_lower,Cd_lower,Re_upper,Cd_upper,Re)
         if 200000 < Re < 500000:
             Re_lower = 200000
             Re_upper = 500000
-            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower)
-            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper)
+            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower,r,perfil_variable)
+            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper,r,perfil_variable)
             Cl = Interpolate_Module.interpolate_fcn(Re_lower,Cl_lower,Re_upper,Cl_upper,Re)
             Cd = Interpolate_Module.interpolate_fcn(Re_lower,Cd_lower,Re_upper,Cd_upper,Re)
         if 500000 < Re < 1000000:
             Re_lower = 500000
             Re_upper = 1000000
-            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower)
-            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper)
+            Cl_lower, Cd_lower = Interpolate_Extrapolate_Re(alpha,Re_lower,r,perfil_variable)
+            Cl_upper, Cd_upper = Interpolate_Extrapolate_Re(alpha,Re_upper,r,perfil_variable)
             Cl = Interpolate_Module.interpolate_fcn(Re_lower,Cl_lower,Re_upper,Cl_upper,Re)
             Cd = Interpolate_Module.interpolate_fcn(Re_lower,Cd_lower,Re_upper,Cd_upper,Re)
         if 50000 > Re:
-            df = pd.read_csv(Datos.url_Re50000, skiprows=10)
+            df = Airfoil_Module.archivo_Re(r,perfil_variable,50000)
             alpha_column = df['Alpha']
             alpha_min_tab = alpha_column.iloc[1]
             alpha_max_tab = alpha_column.iloc[-1]
             simetria = Extrapolate_Module.symmetry(df_airfoil)
             if simetria == True:
                 if alpha_min_tab < alpha < alpha_max_tab: 
-                    Cl, Cd = Interpolate_Extrapolate_Re(alpha, 50000)
+                    Cl, Cd = Interpolate_Extrapolate_Re(alpha,50000,r,perfil_variable)
                 else:
                     Cl, Cd = Extrapolate_Module.extrapolate_symmetrical(df,df_airfoil,alpha,Re)
             else:
                 if alpha_min_tab < alpha < alpha_max_tab: 
-                    Cl, Cd = Interpolate_Extrapolate_Re(alpha, 50000)
+                    Cl, Cd = Interpolate_Extrapolate_Re(alpha,50000,r,perfil_variable)
                 else:
                     Cl, Cd = Extrapolate_Module.extrapolate_asymmetrical(df,df_airfoil,alpha,Re)
         if 1000000 < Re:
-            df = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+            df = Airfoil_Module.archivo_Re(r,perfil_variable,1000000)
             alpha_column = df['Alpha']
             alpha_min_tab = alpha_column.iloc[1]
             alpha_max_tab = alpha_column.iloc[-1]
             simetria = Extrapolate_Module.symmetry(df_airfoil)
             if simetria == True:
                 if alpha_min_tab < alpha < alpha_max_tab: 
-                    Cl, Cd = Interpolate_Extrapolate_Re(alpha, 1000000)
+                    Cl, Cd = Interpolate_Extrapolate_Re(alpha,1000000,r,perfil_variable)
                 else:
                     Cl, Cd = Extrapolate_Module.extrapolate_symmetrical(df,df_airfoil,alpha,Re)
             else:
                 if alpha_min_tab < alpha < alpha_max_tab: 
-                    Cl, Cd = Interpolate_Extrapolate_Re(alpha, 1000000)
+                    Cl, Cd = Interpolate_Extrapolate_Re(alpha,1000000,r,perfil_variable)
                 else:
                     Cl, Cd = Extrapolate_Module.extrapolate_asymmetrical(df,df_airfoil,alpha,Re)
     return Cl, Cd
 
 #-----------------------------------------------------------------#
 #Cl y Cd corregidos según la influencia del número de Mach
-def Cl_Cd_corregido(alpha, Cl, Cd, Mach):
+def Cl_Cd_corregido(alpha, Cl, Cd, Mach, r, perfil_variable):
 
     transonico = False
     supersonico = False
 
-    df_airfoil = pd.read_csv(Datos.archivo_csv)
+    df_airfoil = Airfoil_Module.coordenadas_perfil(r,perfil_variable)
     espesor = Camber_Module.thickness_max(df_airfoil)
     curvatura_media = Camber_Module.camber_med(df_airfoil)
     alpha_rad = alpha*Datos.pi/180

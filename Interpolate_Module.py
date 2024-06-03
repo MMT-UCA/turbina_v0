@@ -6,6 +6,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import Datos
+import Airfoil_Module
 
 #-----------------------------------------------------------------#
 
@@ -35,31 +36,31 @@ def interpolate_alpha(x_list, y_list, alpha):
 
 #-----------------------------------------------------------------#
 #Funciones principales de interpolación de Cl y Cd en función de Re
-def interpolate_Cl(alpha,Re):
+def interpolate_Cl(alpha,Re,r,perfil_variable):
 
     if 50000 <= Re < 100000:
-        df = pd.read_csv(Datos.url_Re50000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re100000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,50000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,100000)
         Re_lower = 50000
         Re_upper = 100000
     elif 100000 <= Re < 200000:
-        df = pd.read_csv(Datos.url_Re100000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re200000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,100000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,200000)
         Re_lower = 100000
         Re_upper = 200000
     elif 200000 <= Re < 500000:
-        df = pd.read_csv(Datos.url_Re200000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re500000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,200000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,500000)
         Re_lower = 200000
         Re_upper = 500000
     elif 500000 <= Re < 1000000:
-        df = pd.read_csv(Datos.url_Re500000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,500000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,1000000)
         Re_lower = 500000
         Re_upper = 1000000
     elif Re == 1000000:
-        df = pd.read_csv(Datos.url_Re1000000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,1000000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,1000000)
         Re_lower = 1000000
         Re_upper = 1000000
     else:
@@ -92,31 +93,31 @@ def interpolate_Cl(alpha,Re):
 
     return Cl_final
 
-def interpolate_Cd(alpha,Re):
+def interpolate_Cd(alpha,Re,r,perfil_variable):
 
     if 50000 <= Re < 100000:
-        df = pd.read_csv(Datos.url_Re50000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re100000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,50000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,100000)
         Re_lower = 50000
         Re_upper = 100000
     elif 100000 <= Re < 200000:
-        df = pd.read_csv(Datos.url_Re100000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re200000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,100000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,200000)
         Re_lower = 100000
         Re_upper = 200000
     elif 200000 <= Re < 500000:
-        df = pd.read_csv(Datos.url_Re200000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re500000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,200000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,500000)
         Re_lower = 200000
         Re_upper = 500000
     elif 500000 <= Re < 1000000:
-        df = pd.read_csv(Datos.url_Re500000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,500000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,1000000)
         Re_lower = 500000
         Re_upper = 1000000
     elif Re == 1000000:
-        df = pd.read_csv(Datos.url_Re1000000, skiprows=10)
-        df_2 = pd.read_csv(Datos.url_Re1000000, skiprows=10)
+        df = Airfoil_Module.archivo_Re(r,perfil_variable,1000000)
+        df_2 = Airfoil_Module.archivo_Re(r,perfil_variable,1000000)
         Re_lower = 1000000
         Re_upper = 1000000
     else:

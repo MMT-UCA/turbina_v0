@@ -8,6 +8,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import Datos
 import numpy as np
+import globals
+import os
 #-----------------------------------------------------------------#
 #Función de cálculo de coordenadas del perfil intermedio
 
@@ -227,138 +229,186 @@ def plot_intermediate_airfoil():
 #se leerá su archivo de coordenadas .csv. Si el radio no tiene un perfil asignado,
 #se realizará una interpolación entre las coordenadas de los perfiles anterior y posterior.
 
-def archivo_Re(r,perfil_variable,Re):
+#Los archivos de los perfiles intermedios sólo se calculan para j = 0 y C = 0, es decir, primera iteración.
+#En el resto de iteraciones se cogen los datos de la carpeta_salida. Si se desea cambiar el valor de C inicial, hay que hacerlo
+#también en el módulo.
+
+def archivo_Re(r,perfil_variable,Re,df_csv_variable,j,C):
+
+    carpeta_salida = 'Archivos_NACA_Airfoil_Module'
 
     if perfil_variable == False:
         
         nombre_archivo_Re = 'Datos.url_Re' + str(Re)
         archivo_Re = eval(nombre_archivo_Re)
-        df_Re = pd.read_csv(archivo_Re)
+        df_Re = pd.read_csv(archivo_Re,skiprows=10)
     
     else:
 
-        df = pd.read_csv(Datos.archivo_csv_variable)
-        radio = df['radio']
-        perfil = df['perfil']
-        nombre_archivo = df['nombre_archivo']
-        tol = 0.1
+        if j == 0 and C == 0: ###
 
-        
-        alpha_list = []
-        Cl_list= []
-        Cd_list = [] 
+            df = df_csv_variable
+            radio = df['radio']
+            perfil = df['perfil']
+            tol = 0.1
 
-        r_puntomedio = r + (Datos.dr / 2)
+            
+            alpha_list = []
+            Cl_list= []
+            Cd_list = [] 
 
-        if np.isclose(r_puntomedio, radio).any():
-            # Encontrar el índice del valor cercano
-            idx = np.where(np.isclose(radio, r_puntomedio))[0][0]
-            fila_actual = df.iloc[idx]
-            nombre_perfil = fila_actual['perfil']
-            nombre_archivo_Re = 'Datos.url__' + nombre_perfil + '_Re' + str(Re)
-            archivo_Re = eval(nombre_archivo_Re)
-            df_Re = pd.read_csv(archivo_Re,skiprows=10)
+            r_puntomedio = r + (Datos.dr / 2)
+            
+
+            if np.isclose(r_puntomedio, radio).any():
+                # Encontrar el índice del valor cercano
+                idx = np.where(np.isclose(radio, r_puntomedio))[0][0]
+                fila_actual = df.iloc[idx]
+                nombre_perfil = fila_actual['perfil']
+                nombre_archivo_Re = 'Datos.url__' + nombre_perfil + '_Re' + str(Re)
+                archivo_Re = eval(nombre_archivo_Re)
+                nombre_df = 'df_' + nombre_perfil + '_Re' + str(Re)
+                df_Re = globals.global_vars[nombre_df]
+
+            else:
+                # Encontrar el valor inmediatamente superior en la lista
+                r_upper = radio[radio >= r_puntomedio].min()
+                # Encontrar el valor inmediatamente inferior en la lista
+                r_lower = radio[radio <= r_puntomedio].max()
+                # Obtener los valores de perfil correspondientes a los r encontrados
+                perfil_lower = perfil[radio == r_lower].iloc[0] if not pd.isnull(r_lower) else None
+                perfil_upper = perfil[radio == r_upper].iloc[0] if not pd.isnull(r_upper) else None
+                nombre_archivo_Re_lower = 'Datos.url__' + perfil_lower + '_Re' + str(Re)
+                archivo_Re_lower = eval(nombre_archivo_Re_lower)
+                nombre_df_lower = 'df_' + perfil_lower + '_Re' + str(Re)
+                df_airfoil_lower = globals.global_vars[nombre_df_lower]
+                nombre_archivo_Re_upper = 'Datos.url__' + perfil_upper + '_Re' + str(Re)
+                archivo_Re_upper = eval(nombre_archivo_Re_upper)
+                nombre_df_upper = 'df_' + perfil_upper + '_Re' + str(Re)
+                df_airfoil_upper = globals.global_vars[nombre_df_upper]
+
+                alpha_column_lower = df_airfoil_lower['Alpha']
+                alpha_min_tab_lower = alpha_column_lower.iloc[1]
+                alpha_max_tab_lower = alpha_column_lower.iloc[-1]
+                alpha_column_upper = df_airfoil_upper['Alpha']
+                alpha_min_tab_upper = alpha_column_upper.iloc[1]
+                alpha_max_tab_upper = alpha_column_upper.iloc[-1]
+
+                if alpha_min_tab_lower < alpha_min_tab_upper or alpha_min_tab_lower == alpha_min_tab_upper:
+                    alpha_min_tab = alpha_min_tab_upper
+                else:
+                    alpha_min_tab = alpha_min_tab_lower
+
+                if alpha_max_tab_lower < alpha_max_tab_upper or alpha_max_tab_lower == alpha_max_tab_upper:
+                    alpha_max_tab = alpha_max_tab_lower
+                else:
+                    alpha_max_tab = alpha_max_tab_upper
+
+                alpha_lower_list = df_airfoil_lower['Alpha'].tolist()
+                Cl_lower_list = df_airfoil_lower['Cl'].tolist()
+                Cd_lower_list = df_airfoil_lower['Cd'].tolist()
+
+                alpha_upper_list = df_airfoil_upper['Alpha'].tolist()
+                Cl_upper_list = df_airfoil_upper['Cl'].tolist()
+                Cd_upper_list = df_airfoil_upper['Cd'].tolist()
+
+                alpha = alpha_min_tab
+                while alpha <= alpha_max_tab:
+
+                    #Lista lower
+                    #Encontrar el valor inmediatamente superior en la lista
+                    alpha_upper_lower = min([alpha_min for alpha_min in alpha_lower_list if alpha_min >= alpha])
+                    # Encontrar el valor inmediatamente inferior en la lista
+                    alpha_lower_lower = max([alpha_max for alpha_max in alpha_lower_list if alpha_max <= alpha])
+                    # Obtener los valores de Cl correspondientes a los alpha encontrados
+                    Cl_lower_lower = Cl_lower_list[alpha_lower_list.index(alpha_lower_lower)]
+                    Cl_upper_lower = Cl_lower_list[alpha_lower_list.index(alpha_upper_lower)]
+                    # Obtener los valores de Cd correspondientes a los alpha encontrados
+                    Cd_lower_lower = Cd_lower_list[alpha_lower_list.index(alpha_lower_lower)]
+                    Cd_upper_lower = Cd_lower_list[alpha_lower_list.index(alpha_upper_lower)]
+
+                    #Lista upper
+                    #Encontrar el valor inmediatamente superior en la lista
+                    alpha_upper_upper = min([alpha_min for alpha_min in alpha_upper_list if alpha_min >= alpha])
+                    # Encontrar el valor inmediatamente inferior en la lista
+                    alpha_lower_upper = max([alpha_max for alpha_max in alpha_upper_list if alpha_max <= alpha])
+                    # Obtener los valores de Cl correspondientes a los alpha encontrados
+                    Cl_lower_upper = Cl_upper_list[alpha_upper_list.index(alpha_lower_upper)]
+                    Cl_upper_upper = Cl_upper_list[alpha_upper_list.index(alpha_upper_upper)]
+                    # Obtener los valores de Cd correspondientes a los alpha encontrados
+                    Cd_lower_upper = Cd_upper_list[alpha_upper_list.index(alpha_lower_upper)]
+                    Cd_upper_upper = Cd_upper_list[alpha_upper_list.index(alpha_upper_upper)]
+            
+                    def interpolate_Cl_Cd(alpha,alpha_lower,alpha_upper,C_lower,C_upper):
+
+                        if alpha_lower == alpha_upper and C_lower == C_upper:
+                            C = C_upper
+                        else:
+                            C = C_lower + (C_upper-C_lower)*((alpha-alpha_lower)/(alpha_upper-alpha_lower))
+
+                        return C
+                    
+                    Cl_lower_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_lower,alpha_upper_lower,Cl_lower_lower,Cl_upper_lower)
+                    Cl_upper_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_upper,alpha_upper_upper,Cl_lower_upper,Cl_upper_upper)
+                    Cd_lower_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_lower,alpha_upper_lower,Cd_lower_lower,Cd_upper_lower)
+                    Cd_upper_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_upper,alpha_upper_upper,Cd_lower_upper,Cd_upper_upper)
+
+                    def interpolate_final(r,r_lower,r_upper,C_airfoil_anterior,C_airfoil_posterior):
+                        
+                        C_final = C_airfoil_anterior + (C_airfoil_posterior-C_airfoil_anterior)*((r-r_lower)/(r_upper-r_lower))
+
+                        return C_final
+                    
+                    Cl_final = interpolate_final(r_puntomedio,r_lower,r_upper,Cl_lower_airfoil,Cl_upper_airfoil)
+                    Cd_final = interpolate_final(r_puntomedio,r_lower,r_upper,Cd_lower_airfoil,Cd_upper_airfoil)
+                        
+                    alpha_list.append(alpha)
+                    Cl_list.append(Cl_final)
+                    Cd_list.append(Cd_final)
+
+                    alpha += tol
+
+
+                data = {'Alpha': alpha_list, 'Cl': Cl_list, 'Cd': Cd_list}
+                df_Re = pd.DataFrame(data)
+
+                # Crear la carpeta si no existe
+                if not os.path.exists(carpeta_salida):
+                    os.makedirs(carpeta_salida)
+
+                r_sen = format(r, ".2f")
+
+                nombre_archivo_df = f"df_Re_{r_sen}_{Re}.csv"
+                ruta_archivo = os.path.join(carpeta_salida, nombre_archivo_df)
+
+                df_Re.to_csv(ruta_archivo, index=False)
+
+                #print(f"Archivo guardado: {ruta_archivo}")
+
 
         else:
-            # Encontrar el valor inmediatamente superior en la lista
-            r_upper = radio[radio >= r_puntomedio].min()
-            # Encontrar el valor inmediatamente inferior en la lista
-            r_lower = radio[radio <= r_puntomedio].max()
-            # Obtener los valores de perfil correspondientes a los r encontrados
-            perfil_lower = perfil[radio == r_lower].iloc[0] if not pd.isnull(r_lower) else None
-            perfil_upper = perfil[radio == r_upper].iloc[0] if not pd.isnull(r_upper) else None
-            nombre_archivo_Re_lower = 'Datos.url__' + perfil_lower + '_Re' + str(Re)
-            archivo_Re_lower = eval(nombre_archivo_Re_lower)
-            df_airfoil_lower = pd.read_csv(archivo_Re_lower, skiprows=10)
-            nombre_archivo_Re_upper = 'Datos.url__' + perfil_upper + '_Re' + str(Re)
-            archivo_Re_upper = eval(nombre_archivo_Re_upper)
-            df_airfoil_upper = pd.read_csv(archivo_Re_upper, skiprows=10)
+            df = df_csv_variable
+            radio = df['radio']
+            perfil = df['perfil']
+            r_puntomedio = r + (Datos.dr / 2)
 
-            alpha_column_lower = df_airfoil_lower['Alpha']
-            alpha_min_tab_lower = alpha_column_lower.iloc[1]
-            alpha_max_tab_lower = alpha_column_lower.iloc[-1]
-            alpha_column_upper = df_airfoil_upper['Alpha']
-            alpha_min_tab_upper = alpha_column_upper.iloc[1]
-            alpha_max_tab_upper = alpha_column_upper.iloc[-1]
-
-            if alpha_min_tab_lower < alpha_min_tab_upper or alpha_min_tab_lower == alpha_min_tab_upper:
-                alpha_min_tab = alpha_min_tab_upper
+            if np.isclose(r_puntomedio, radio).any():
+                # Encontrar el índice del valor cercano
+                idx = np.where(np.isclose(radio, r_puntomedio))[0][0]
+                fila_actual = df.iloc[idx]
+                nombre_perfil = fila_actual['perfil']
+                nombre_archivo_Re = 'Datos.url__' + nombre_perfil + '_Re' + str(Re)
+                archivo_Re = eval(nombre_archivo_Re)
+                nombre_df = 'df_' + nombre_perfil + '_Re' + str(Re)
+                df_Re = globals.global_vars[nombre_df]
+            
             else:
-                alpha_min_tab = alpha_min_tab_lower
+                r_sen = format(r, ".2f")
+                nombre_df = 'df_Re_' + r_sen + '_' + str(Re) +'.csv'
+                carpeta = 'Archivos_NACA_Airfoil_Module'
+                ruta_archivo = os.path.join(carpeta, nombre_df)
+                df_Re = pd.read_csv(ruta_archivo)
 
-            if alpha_max_tab_lower < alpha_max_tab_upper or alpha_max_tab_lower == alpha_max_tab_upper:
-                alpha_max_tab = alpha_max_tab_lower
-            else:
-                alpha_max_tab = alpha_max_tab_upper
-
-            alpha_lower_list = df_airfoil_lower['Alpha'].tolist()
-            Cl_lower_list = df_airfoil_lower['Cl'].tolist()
-            Cd_lower_list = df_airfoil_lower['Cd'].tolist()
-
-            alpha_upper_list = df_airfoil_upper['Alpha'].tolist()
-            Cl_upper_list = df_airfoil_upper['Cl'].tolist()
-            Cd_upper_list = df_airfoil_upper['Cd'].tolist()
-
-            alpha = alpha_min_tab
-            while alpha <= alpha_max_tab:
-
-                #Lista lower
-                #Encontrar el valor inmediatamente superior en la lista
-                alpha_upper_lower = min([alpha_min for alpha_min in alpha_lower_list if alpha_min >= alpha])
-                # Encontrar el valor inmediatamente inferior en la lista
-                alpha_lower_lower = max([alpha_max for alpha_max in alpha_lower_list if alpha_max <= alpha])
-                # Obtener los valores de Cl correspondientes a los alpha encontrados
-                Cl_lower_lower = Cl_lower_list[alpha_lower_list.index(alpha_lower_lower)]
-                Cl_upper_lower = Cl_lower_list[alpha_lower_list.index(alpha_upper_lower)]
-                # Obtener los valores de Cd correspondientes a los alpha encontrados
-                Cd_lower_lower = Cd_lower_list[alpha_lower_list.index(alpha_lower_lower)]
-                Cd_upper_lower = Cd_lower_list[alpha_lower_list.index(alpha_upper_lower)]
-
-                #Lista upper
-                #Encontrar el valor inmediatamente superior en la lista
-                alpha_upper_upper = min([alpha_min for alpha_min in alpha_upper_list if alpha_min >= alpha])
-                # Encontrar el valor inmediatamente inferior en la lista
-                alpha_lower_upper = max([alpha_max for alpha_max in alpha_upper_list if alpha_max <= alpha])
-                # Obtener los valores de Cl correspondientes a los alpha encontrados
-                Cl_lower_upper = Cl_upper_list[alpha_upper_list.index(alpha_lower_upper)]
-                Cl_upper_upper = Cl_upper_list[alpha_upper_list.index(alpha_upper_upper)]
-                # Obtener los valores de Cd correspondientes a los alpha encontrados
-                Cd_lower_upper = Cd_upper_list[alpha_upper_list.index(alpha_lower_upper)]
-                Cd_upper_upper = Cd_upper_list[alpha_upper_list.index(alpha_upper_upper)]
-        
-                def interpolate_Cl_Cd(alpha,alpha_lower,alpha_upper,C_lower,C_upper):
-
-                    if alpha_lower == alpha_upper and C_lower == C_upper:
-                        C = C_upper
-                    else:
-                        C = C_lower + (C_upper-C_lower)*((alpha-alpha_lower)/(alpha_upper-alpha_lower))
-
-                    return C
-                
-                Cl_lower_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_lower,alpha_upper_lower,Cl_lower_lower,Cl_upper_lower)
-                Cl_upper_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_upper,alpha_upper_upper,Cl_lower_upper,Cl_upper_upper)
-                Cd_lower_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_lower,alpha_upper_lower,Cd_lower_lower,Cd_upper_lower)
-                Cd_upper_airfoil = interpolate_Cl_Cd(alpha,alpha_lower_upper,alpha_upper_upper,Cd_lower_upper,Cd_upper_upper)
-
-                def interpolate_final(r,r_lower,r_upper,C_airfoil_anterior,C_airfoil_posterior):
-                    
-                    C_final = C_airfoil_anterior + (C_airfoil_posterior-C_airfoil_anterior)*((r-r_lower)/(r_upper-r_lower))
-
-                    return C_final
-                
-                Cl_final = interpolate_final(r_puntomedio,r_lower,r_upper,Cl_lower_airfoil,Cl_upper_airfoil)
-                Cd_final = interpolate_final(r_puntomedio,r_lower,r_upper,Cd_lower_airfoil,Cd_upper_airfoil)
-                    
-                alpha_list.append(alpha)
-                Cl_list.append(Cl_final)
-                Cd_list.append(Cd_final)
-
-                alpha += tol
-
-
-            data = {'Alpha': alpha_list, 'Cl': Cl_list, 'Cd': Cd_list}
-            df_Re = pd.DataFrame(data)
-    
     return df_Re
 
 #-----------------------------------------------------------------#

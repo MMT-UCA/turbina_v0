@@ -13,6 +13,8 @@ import Interpolate_Extrapolate_Module
 import csv
 import numpy as np
 import Chord_Twist_Module
+import Airfoil_Module
+import Load_Module
 
 #-----------------------------------------------------------------#
 #FUNCIONES
@@ -89,6 +91,13 @@ def helice(C,Beta):
     T = 0
     T_anterior = 1 
     perfil_variable = Datos.perfil_variable
+    if perfil_variable == True:
+        df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
+        #load_Re_map = Load_Module.load_Re(df_csv_variable)
+    else:
+        df_csv_variable = None
+        
+
 
     j = 0
     #Bucle
@@ -99,6 +108,7 @@ def helice(C,Beta):
         i = 0
         r_vind = Datos.r_o
         while r_vind <= (Datos.D)/2:
+            df_airfoil = Airfoil_Module.coordenadas_perfil(r_vind,perfil_variable)
             Beta_radio = Beta - Beta_n_crucero + Beta_crucero[i]
             Beta_rad = Beta_radio * Datos.pi / 180
             #Call velocidades inducidas 
@@ -112,13 +122,13 @@ def helice(C,Beta):
             alfa = 180 * alfa_rad / Datos.pi
             Re = rhoz * (C_Tcuad) ** 0.5 * valor_cuerda[i] / Visc
             #####Call Cl_Cd#####
-            Cl, Cd = Interpolate_Extrapolate_Module.Interpolate_Extrapolate(alfa, Re,r_vind,perfil_variable)
+            Cl, Cd = Interpolate_Extrapolate_Module.Interpolate_Extrapolate(alfa, Re,r_vind,perfil_variable,df_airfoil,df_csv_variable,j,C)
 
             #Cálculo de Mach
             A_sonido = CP.PropsSI("A", "T", Tempe, "P", Presi, "air")
             Mach = ((C_Tcuad) ** 0.5) / A_sonido
             #####Call Cl_Cd corregido#####
-            Cl_corregido, Cd_corregido, transonico, supersonico = Interpolate_Extrapolate_Module.Cl_Cd_corregido(alfa,Cl,Cd,Mach,r_vind,perfil_variable)
+            Cl_corregido, Cd_corregido, transonico, supersonico = Interpolate_Extrapolate_Module.Cl_Cd_corregido(alfa,Cl,Cd,Mach,r_vind,perfil_variable,df_airfoil)
 
             #Cálculo de tracción y potencia
             dTrac = C_Tcuad * (Cl_corregido * math.cos(Phi_rad) - Cd_corregido * math.sin(Phi_rad)) * Datos.dr
@@ -148,11 +158,20 @@ def helice(C,Beta):
 
     return  T, Q, W
 
+""" df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
+load_Re_map = Load_Module.load_Re(df_csv_variable)
+T, Q, W = helice(50,50) """
+
 #-----------------------------------------------------------------#
 #CSV
 #Crea archivos csv de: T-C, W-C, eta-C, Ct-J, Cp-J
 
 def csv_complete():
+
+    perfil_variable = Datos.perfil_variable
+    if perfil_variable == True:
+        df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
+        load_Re_map = Load_Module.load_Re(df_csv_variable)
 
     #T vs C
     def crear_csv(datos, nombre_archivo):
@@ -288,22 +307,23 @@ def csv_complete():
                 datos_eta[C].append(eta)
 
 
-    nombre_archivo_T = 'T_C_cuerdatorsion_var.csv'
+    nombre_archivo_T = 'T_C_cuerdatorsion_var_airfoil.csv'
     crear_csv(datos_T, nombre_archivo_T)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_T}'.")
-    nombre_archivo_W = 'W_C_cuerdatorsion_var.csv'
+    nombre_archivo_W = 'W_C_cuerdatorsion_var_airfoil.csv'
     crear_csv_W(datos_W, nombre_archivo_W)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_W}'.")
-    nombre_archivo_eta = 'eta_C_cuerdatorsion_var.csv'
+    nombre_archivo_eta = 'eta_C_cuerdatorsion_var_airfoil.csv'
     crear_csv_eta(datos_eta, nombre_archivo_eta)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_eta}'.")
-    nombre_archivo_Ct = 'Ct_J_cuerdatorsion_var.csv'
+    nombre_archivo_Ct = 'Ct_J_cuerdatorsion_var_airfoil.csv'
     crear_csv_Ct(datos_Ct, nombre_archivo_Ct)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_Ct}'.")
-    nombre_archivo_Cp = 'Cp_J_cuerdatorsion_var.csv'
+    nombre_archivo_Cp = 'Cp_J_cuerdatorsion_var_airfoil.csv'
     crear_csv_Cp(datos_Cp, nombre_archivo_Cp)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_Cp}'.")
 
+#csv_complete()
 #-----------------------------------------------------------------#
 
 #PLOT
@@ -312,14 +332,21 @@ def csv_complete():
 
 def plot_sincsv():
 
-    betas = [30, 40]
+    perfil_variable = Datos.perfil_variable
+    if perfil_variable == True:
+        df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
+        load_Re_map = Load_Module.load_Re(df_csv_variable)
+    else:
+        df_csv_variable = None
+
+    betas = [60]
     colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
 
     for Beta, color in zip(betas, colores):
         valores_T = []
         valores_C = []
 
-        for C in range(0, 101):
+        for C in range(240, 245):
             T, Q, W = helice(C,Beta)
             print('Beta,C,T:', Beta, C, T)
             valores_T.append(T)
@@ -335,6 +362,8 @@ def plot_sincsv():
     plt.legend()
 
     plt.show()
+
+#plot_sincsv()
 
 #-----------------------------------------------------------------#
 #Plot con el csv
@@ -412,9 +441,9 @@ def plot_eta_C():
 #-----------------------------------------------------------------#
 
 #PRUEBAS
-for C in range (0, 220, 1):
+""" for C in range (0, 220, 1):
     T, Q, W = helice(C, 50)
-    print('T,Q,W:', T, Q, W)
+    print('T,Q,W:', T, Q, W) """
 
 """ plot_T_C()
 plot_W_C()

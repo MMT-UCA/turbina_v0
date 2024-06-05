@@ -48,7 +48,7 @@ Ah = pi*(D**2)/4
 
 cuerda_variable = True
 
-cuerda_csv = "datos_cuerda_2.csv"
+cuerda_csv = "datos_cuerda.csv"
 
 cuerda_fija = 0.1 #m
 
@@ -70,7 +70,7 @@ n_vind = 0.2
 
 torsion_variable = True
 
-torsion_csv = "datos_torsion_2.csv"
+torsion_csv = "datos_torsion.csv"
 
 alfa_diseno = 5 #°
 
@@ -164,15 +164,15 @@ archivo_csv = "Coordenadas.csv"
 
 #Resultados
 
-T_C_csv = "T_C_cuerdatorsion_var.csv"
+T_C_csv = "T_C_cuerdatorsion_var_airfoil.csv"
 
-W_C_csv = "W_C_cuerdatorsion_var.csv"
+W_C_csv = "W_C_cuerdatorsion_var_airfoil.csv"
 
-eta_C_csv = "eta_C_cuerdatorsion_var.csv"
+eta_C_csv = "eta_C_cuerdatorsion_var_airfoil.csv"
 
-Ct_J_csv = "Ct_J_cuerdatorsion_var.csv"
+Ct_J_csv = "Ct_J_cuerdatorsion_var_airfoil.csv"
 
-Cp_J_csv = "Cp_J_cuerdatorsion_var.csv"
+Cp_J_csv = "Cp_J_cuerdatorsion_var_airfoil.csv"
 
 resultados_principal_csv = "resultados_principal.csv"
 

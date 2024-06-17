@@ -7,7 +7,7 @@
 import math
 import pandas as pd
 import matplotlib.pyplot as plt
-import Datos
+from Datos import Datos
 import CoolProp.CoolProp as CP
 import Interpolate_Extrapolate_Module
 import csv
@@ -15,6 +15,7 @@ import numpy as np
 import Chord_Twist_Module
 import Airfoil_Module
 import Load_Module
+import os
 
 #-----------------------------------------------------------------#
 #FUNCIONES
@@ -59,9 +60,9 @@ def velocidades_inducidas(r,T_anterior,Beta_rad,C):
         f_x = 0
 
     #Ratio P/D variable
-    ratio_PD = (r / r_max) * Datos.pi * math.tan(Beta_rad * Datos.pi / 180)
-    f_theta = (f_x / Datos.pi) * (ratio_PD / (r / r_max))
-    C_i = (((C ** 2) / 4) + (f_x / (4 * rhoz * Datos.pi * r))) ** (0.5) - (C / 2)
+    ratio_PD = (r / r_max) * math.pi * math.tan(Beta_rad * math.pi / 180)
+    f_theta = (f_x / math.pi) * (ratio_PD / (r / r_max))
+    C_i = (((C ** 2) / 4) + (f_x / (4 * rhoz * math.pi * r))) ** (0.5) - (C / 2)
 
     if C_i > 340:
         C_i = 340
@@ -69,7 +70,7 @@ def velocidades_inducidas(r,T_anterior,Beta_rad,C):
     if abs(C_i + C) < 1E-05 or f_theta < 0:
         omega_i = 0
     else:
-        V_i = f_theta / (2 * Datos.pi * r * rhoz * (C + C_i))
+        V_i = f_theta / (2 * math.pi * r * rhoz * (C + C_i))
         if V_i > 340:
             V_i = 340
         omega_i = V_i / r
@@ -110,7 +111,7 @@ def helice(C,Beta):
         while r_vind <= (Datos.D)/2:
             df_airfoil = Airfoil_Module.coordenadas_perfil(r_vind,perfil_variable)
             Beta_radio = Beta - Beta_n_crucero + Beta_crucero[i]
-            Beta_rad = Beta_radio * Datos.pi / 180
+            Beta_rad = Beta_radio * math.pi / 180
             #Call velocidades inducidas 
             Ci, omega_i = velocidades_inducidas(r_vind, T_anterior,Beta_rad,C)
             C_Tcuad = (C + Ci) ** 2 + ((Datos.omega - omega_i) * r_vind) ** 2
@@ -118,8 +119,8 @@ def helice(C,Beta):
         
             #Cálculo de beta en cada posición
             alfa_rad = Beta_rad - Phi_rad
-            Phi_grad = Phi_rad * 180 / Datos.pi
-            alfa = 180 * alfa_rad / Datos.pi
+            Phi_grad = Phi_rad * 180 / math.pi
+            alfa = 180 * alfa_rad / math.pi
             Re = rhoz * (C_Tcuad) ** 0.5 * valor_cuerda[i] / Visc
             #####Call Cl_Cd#####
             Cl, Cd = Interpolate_Extrapolate_Module.Interpolate_Extrapolate(alfa, Re,r_vind,perfil_variable,df_airfoil,df_csv_variable,j,C)
@@ -158,20 +159,20 @@ def helice(C,Beta):
 
     return  T, Q, W
 
-""" df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
-load_Re_map = Load_Module.load_Re(df_csv_variable)
-T, Q, W = helice(50,50) """
-
 #-----------------------------------------------------------------#
 #CSV
 #Crea archivos csv de: T-C, W-C, eta-C, Ct-J, Cp-J
 
-def csv_complete():
+def csv_complete(betas):
 
     perfil_variable = Datos.perfil_variable
     if perfil_variable == True:
         df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
         load_Re_map = Load_Module.load_Re(df_csv_variable)
+
+    carpeta_resultados = os.path.join(os.getcwd(), 'Archivos_Resultados')
+    if not os.path.exists(carpeta_resultados):
+        os.makedirs(carpeta_resultados)
 
     #T vs C
     def crear_csv(datos, nombre_archivo):
@@ -255,8 +256,6 @@ def csv_complete():
     datos_Ct:map = {}
     datos_Cp:map = {}
 
-    betas = [10, 20, 30, 40, 50, 60, 70, 80]
-
     for Beta in betas:
         values_T:list = []
         values_W:list = []
@@ -264,7 +263,7 @@ def csv_complete():
         values_Ct:list = []
         values_Cp:list = []
         T_ant = 1
-        for C in range(0, 401):
+        for C in range(0,401):
             J = C/(Datos.RPS * Datos.D)
             if T_ant != 0:
                 T, Q, W = helice(C, Beta)
@@ -279,7 +278,6 @@ def csv_complete():
                 eta = 0
             else:
                 eta = (Ct*J)/Cp
-            print(C,Beta)
             values_T.append([C, T])
             values_W.append([C, W])
             values_Ct.append([J,Ct])
@@ -309,143 +307,111 @@ def csv_complete():
 
     nombre_archivo_T = 'T_C_cuerdatorsion_var_airfoil.csv'
     crear_csv(datos_T, nombre_archivo_T)
-    print(f"Se ha creado el archivo CSV '{nombre_archivo_T}'.")
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_T}' en la carpeta 'Archivos_Resultados'.")
     nombre_archivo_W = 'W_C_cuerdatorsion_var_airfoil.csv'
     crear_csv_W(datos_W, nombre_archivo_W)
-    print(f"Se ha creado el archivo CSV '{nombre_archivo_W}'.")
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_W}' en la carpeta 'Archivos_Resultados'.")
     nombre_archivo_eta = 'eta_C_cuerdatorsion_var_airfoil.csv'
     crear_csv_eta(datos_eta, nombre_archivo_eta)
-    print(f"Se ha creado el archivo CSV '{nombre_archivo_eta}'.")
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_eta}' en la carpeta 'Archivos_Resultados'.")
     nombre_archivo_Ct = 'Ct_J_cuerdatorsion_var_airfoil.csv'
     crear_csv_Ct(datos_Ct, nombre_archivo_Ct)
-    print(f"Se ha creado el archivo CSV '{nombre_archivo_Ct}'.")
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_Ct}' en la carpeta 'Archivos_Resultados'.")
     nombre_archivo_Cp = 'Cp_J_cuerdatorsion_var_airfoil.csv'
     crear_csv_Cp(datos_Cp, nombre_archivo_Cp)
-    print(f"Se ha creado el archivo CSV '{nombre_archivo_Cp}'.")
+    print(f"Se ha creado el archivo CSV '{nombre_archivo_Cp}' en la carpeta 'Archivos_Resultados'.")
 
-#csv_complete()
 #-----------------------------------------------------------------#
 
 #PLOT
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-#Plot sin el csv
+def plot_complete(betas):
 
-def plot_sincsv():
+    carpeta_plots = os.path.join(os.getcwd(), 'Archivos_Resultados', 'Plots')
+    if not os.path.exists(carpeta_plots):
+        os.makedirs(carpeta_plots)
 
-    perfil_variable = Datos.perfil_variable
-    if perfil_variable == True:
-        df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
-        load_Re_map = Load_Module.load_Re(df_csv_variable)
-    else:
-        df_csv_variable = None
+    def plot_T_C():
 
-    betas = [60]
-    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
+        df = pd.read_csv(Datos.T_C_csv)
+        valores_C = df['C']
 
-    for Beta, color in zip(betas, colores):
-        valores_T = []
-        valores_C = []
+        colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'brown', 'cyan', 'magenta']
 
-        for C in range(240, 245):
-            T, Q, W = helice(C,Beta)
-            print('Beta,C,T:', Beta, C, T)
-            valores_T.append(T)
-            valores_C.append(C)
+        i = 1
+        plt.figure(figsize=(10, 7))
+        for Beta, color in zip(betas, colores):
+            columna_T = f"T(B={Beta}°)"
+            valores_T = df[columna_T]
+            plt.plot(valores_C, valores_T,label=f'Beta = {Beta}', color=color)
 
-        plt.scatter(valores_C, valores_T,label=f'Beta = {Beta}', color=color)
+        plt.xlabel('C')
+        plt.ylabel('T')
+        plt.title('T vs C')
+
+        plt.legend()
+
+        ruta_archivo = os.path.join(carpeta_plots, 'T_vs_C.png')
+        plt.savefig(ruta_archivo)
+
+        print(f"Se ha creado la imagen T_vs_C.png.")
 
 
-    plt.xlabel('C')
-    plt.ylabel('T')
-    plt.title('T vs C')
+    def plot_W_C():
 
-    plt.legend()
+        df = pd.read_csv(Datos.W_C_csv)
+        valores_C = df['C']
 
-    plt.show()
+        colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'brown', 'cyan', 'magenta']
 
-#plot_sincsv()
+        i = 1
+        plt.figure(figsize=(10, 7))
+        for Beta, color in zip(betas, colores):
+            columna_W = f"W(B={Beta}°)"
+            valores_W = df[columna_W]
+            plt.plot(valores_C, valores_W,label=f'Beta = {Beta}', color=color)
 
-#-----------------------------------------------------------------#
-#Plot con el csv
-#T
-def plot_T_C():
+        plt.xlabel('C')
+        plt.ylabel('W')
+        plt.title('W vs C')
 
-    df = pd.read_csv(Datos.T_C_csv)
-    valores_C = df['C']
+        plt.legend()
 
-    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
-    betas = [10, 20, 30, 40, 50, 60]
+        ruta_archivo = os.path.join(carpeta_plots, 'W_vs_C.png')
+        plt.savefig(ruta_archivo)
 
-    i = 1
-    for Beta, color in zip(betas, colores):
-        columna_T = f"T(B={Beta}°)"
-        valores_T = df[columna_T]
-        plt.plot(valores_C, valores_T,label=f'Beta = {Beta}', color=color)
+        print(f"Se ha creado la imagen W_vs_C.png.")
 
-    plt.xlabel('C')
-    plt.ylabel('T')
-    plt.title('T vs C')
 
-    plt.legend()
+    def plot_eta_C():
 
-    plt.show()
+        df = pd.read_csv(Datos.eta_C_csv)
+        valores_C = df['C']
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-#W
-def plot_W_C():
+        colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'brown', 'cyan', 'magenta']
 
-    df = pd.read_csv(Datos.W_C_csv)
-    valores_C = df['C']
+        i = 1
+        plt.figure(figsize=(10, 7))
+        for Beta, color in zip(betas, colores):
+            columna_eta = f"eta(B={Beta}°)"
+            valores_eta = df[columna_eta]
+            plt.plot(valores_C, valores_eta,label=f'Beta = {Beta}', color=color)
 
-    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
-    betas = [10, 20, 30, 40, 50, 60]
+        plt.xlabel('C')
+        plt.ylabel('eta')
+        plt.title('eta vs C')
 
-    i = 1
-    for Beta, color in zip(betas, colores):
-        columna_W = f"W(B={Beta}°)"
-        valores_W = df[columna_W]
-        plt.plot(valores_C, valores_W,label=f'Beta = {Beta}', color=color)
+        plt.legend()
 
-    plt.xlabel('C')
-    plt.ylabel('W')
-    plt.title('W vs C')
+        ruta_archivo = os.path.join(carpeta_plots, 'eta_vs_C.png')
+        plt.savefig(ruta_archivo)
 
-    plt.legend()
+        print(f"Se ha creado la imagen eta_vs_C.png.")
 
-    plt.show()
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-#eta
-def plot_eta_C():
-
-    df = pd.read_csv(Datos.eta_C_csv)
-    valores_C = df['C']
-
-    colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink']
-    betas = [10, 20, 30, 40, 50, 60]
-
-    i = 1
-    for Beta, color in zip(betas, colores):
-        columna_eta = f"eta(B={Beta}°)"
-        valores_eta = df[columna_eta]
-        plt.plot(valores_C, valores_eta,label=f'Beta = {Beta}', color=color)
-
-    plt.xlabel('C')
-    plt.ylabel('eta')
-    plt.title('eta vs C')
-
-    plt.legend()
-
-    plt.show()
+    plot_T_C()
+    plot_W_C()
+    plot_eta_C()
 
 #-----------------------------------------------------------------#
 
-#PRUEBAS
-""" for C in range (0, 220, 1):
-    T, Q, W = helice(C, 50)
-    print('T,Q,W:', T, Q, W) """
-
-""" plot_T_C()
-plot_W_C()
-plot_eta_C() """
 

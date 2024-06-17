@@ -6,7 +6,7 @@
 import math
 import pandas as pd
 import matplotlib.pyplot as plt
-import Datos
+from Datos import Datos
 import numpy as np
 #-----------------------------------------------------------------#
 
@@ -53,7 +53,7 @@ def Torsion():
 
     else:
 
-        alfa_rad = Datos.alfa_diseno * (Datos.pi / 180) #radianes
+        alfa_rad = Datos.alfa_diseno * (math.pi / 180) #radianes
         n = Datos.RPM / 60 #rps
         C_crucero_ms = Datos.C_crucero *(1000/3600)
 
@@ -67,11 +67,9 @@ def Torsion():
             Beta_crucero.append(valor)
             r += Datos.dr
 
-        Beta_n_crucero = (math.atan(Datos.D * j / (2 * Datos.pi * 3 * Datos.D / 8)) + alfa_rad) * 180 / Datos.pi
+        Beta_n_crucero = (math.atan(Datos.D * j / (2 * math.pi * 3 * Datos.D / 8)) + alfa_rad) * 180 / math.pi
     return Beta_crucero, Beta_n_crucero
 
-""" Beta_crucero, Beta_n_crucero = Torsion()
-print(Beta_crucero, Beta_n_crucero) """
 
 #-----------------------------------------------------------------#
 
@@ -121,8 +119,5 @@ def cuerda():
         valor_cuerda_media = valor
 
     return valor_cuerda, valor_cuerda_media
-
-""" valor_cuerda, valor_cuerda_media = cuerda()
-print(valor_cuerda, valor_cuerda_media) """
 
 #-----------------------------------------------------------------#

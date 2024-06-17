@@ -1,0 +1,88 @@
+# Datos
+
+[avion]
+m = 5216 #kg
+n_motor = 2
+C_d = 0.02
+A_a = 16 #m^2
+C_crucero = 593 #km/h
+dt = 1 #s
+dt_acel = 1 #s
+t_fin = 60 #s
+t_fin_acel = 10 #s
+Z = 0 
+C = 0
+x = 0
+
+[helice]
+Beta = 60 #°
+D = 2.2 #m
+r_o = 0.15 #m
+RPM = 2000
+RPS = 33.33  
+Palas = 5
+dr = 0.1 #m
+omega = 209.44  
+Ah = 3.8013271108436504  #m^2
+
+[velocidades_inducidas]
+m_vind = 1
+a_vind = 1
+n_vind = 0.2
+
+[cuerda]
+cuerda_variable = true
+cuerda_csv = "Archivos_Datos/datos_cuerda.csv"
+cuerda_fija = 0.1 #m
+
+[torsion]
+torsion_variable = true
+torsion_csv = "Archivos_Datos/datos_torsion.csv"
+alfa_diseno = 5 #°
+
+[perfil]
+perfil_variable = true
+archivo_csv_variable = "Archivos_Datos/Coordenadas_perfilvariable.csv"
+archivo_csv = "Archivos_Datos/Coordenadas.csv"
+
+[urls_perfil_variable]
+coordenadasNACA0010 = "Archivos_NACA/Coordenadas_NACA0010.csv"
+url__NACA0010_Re50000 = "Archivos_NACA/xf-naca0010-il-50000.csv"
+url__NACA0010_Re100000 = "Archivos_NACA/xf-naca0010-il-100000.csv"
+url__NACA0010_Re200000 = "Archivos_NACA/xf-naca0010-il-200000.csv"
+url__NACA0010_Re500000 = "Archivos_NACA/xf-naca0010-il-500000.csv"
+url__NACA0010_Re1000000 = "Archivos_NACA/xf-naca0010-il-1000000.csv"
+coordenadasNACA0012 = "Archivos_NACA/Coordenadas_NACA0012.csv"
+url__NACA0012_Re50000 = "Archivos_NACA/xf-naca0012-il-50000.csv"
+url__NACA0012_Re100000 = "Archivos_NACA/xf-naca0012-il-100000.csv"
+url__NACA0012_Re200000 = "Archivos_NACA/xf-naca0012-il-200000.csv"
+url__NACA0012_Re500000 = "Archivos_NACA/xf-naca0012-il-500000.csv"
+url__NACA0012_Re1000000 = "Archivos_NACA/xf-naca0012-il-1000000.csv"
+coordenadasNACA2414 = "Archivos_NACA/Coordenadas_NACA2414.csv"
+url__NACA2414_Re50000 = "Archivos_NACA/xf-naca2414-il-50000.csv"
+url__NACA2414_Re100000 = "Archivos_NACA/xf-naca2414-il-100000.csv"
+url__NACA2414_Re200000 = "Archivos_NACA/xf-naca2414-il-200000.csv"
+url__NACA2414_Re500000 = "Archivos_NACA/xf-naca2414-il-500000.csv"
+url__NACA2414_Re1000000 = "Archivos_NACA/xf-naca2414-il-1000000.csv"
+coordenadasNACA2415 = "Archivos_NACA/Coordenadas_NACA2415.csv"
+url__NACA2415_Re50000 = "Archivos_NACA/xf-naca2415-il-50000.csv"
+url__NACA2415_Re100000 = "Archivos_NACA/xf-naca2415-il-100000.csv"
+url__NACA2415_Re200000 = "Archivos_NACA/xf-naca2415-il-200000.csv"
+url__NACA2415_Re500000 = "Archivos_NACA/xf-naca2415-il-500000.csv"
+url__NACA2415_Re1000000 = "Archivos_NACA/xf-naca2415-il-1000000.csv"
+
+[urls_perfil_fijo]
+url_Re50000 = "Archivos_NACA/xf-naca2411-il-50000.csv"
+url_Re100000 = "Archivos_NACA/xf-naca2411-il-100000.csv"
+url_Re200000 = "Archivos_NACA/xf-naca2411-il-200000.csv"
+url_Re500000 = "Archivos_NACA/xf-naca2411-il-500000.csv"
+url_Re1000000 = "Archivos_NACA/xf-naca2411-il-1000000.csv"
+archivo_csv = "Archivos_Datos/Coordenadas.csv"
+
+[archivos_resultados]
+T_C_csv = "Archivos_Resultados/T_C_cuerdatorsion_var_airfoil.csv"
+W_C_csv = "Archivos_Resultados/W_C_cuerdatorsion_var_airfoil.csv"
+eta_C_csv = "Archivos_Resultados/eta_C_cuerdatorsion_var_airfoil.csv"
+Ct_J_csv = "Archivos_Resultados/Ct_J_cuerdatorsion_var_airfoil.csv"
+Cp_J_csv = "Archivos_Resultados/Cp_J_cuerdatorsion_var_airfoil.csv"
+resultados_principal_csv = "Archivos_Resultados/resultados_principal_cuerdatorsion_var_airfoil.csv"

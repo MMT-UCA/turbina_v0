@@ -3,10 +3,9 @@
 #Cálculos de perfil variable
 #-----------------------------------------------------------------#
 #IMPORTS
-import math
 import pandas as pd
 import matplotlib.pyplot as plt
-import Datos
+from Datos import Datos
 import numpy as np
 import globals
 import os
@@ -73,7 +72,7 @@ def coordenadas_perfil(r,perfil_variable):
 
 
             x = 0
-            while x <= 1.0005:
+            while x <= 1:
 
                 if x == 0:
                     y_lower_lower_int = 0
@@ -94,28 +93,11 @@ def coordenadas_perfil(r,perfil_variable):
                     x_lower_upper_ext = 0
                     x_upper_upper_ext = 0
 
-                elif 1e-20 <= x <= 1.0005:
-                    x_lower_lower_int = max([x_max for x_max in x_neg_lower if x_max <= x])
-                    y_lower_lower_int = y_neg_lower[x_neg_lower.index(x_lower_lower_int)]
-                    x_lower_upper_int = max([x_max for x_max in x_neg_upper if x_max <= x])
-                    y_lower_upper_int = y_neg_upper[x_neg_upper.index(x_lower_upper_int)]
-                    x_lower_lower_ext = max([x_max for x_max in x_pos_lower if x_max <= x])
-                    y_lower_lower_ext = y_pos_lower[x_pos_lower.index(x_lower_lower_ext)]
-                    x_lower_upper_ext = max([x_max for x_max in x_pos_upper if x_max <= x])
-                    y_lower_upper_ext = y_pos_upper[x_pos_upper.index(x_lower_upper_ext)]
-                    
-                    x_upper_lower_int = x_lower_lower_int 
-                    y_upper_lower_int = y_lower_lower_int 
-                    x_upper_upper_int = x_lower_upper_int 
-                    y_upper_upper_int = y_lower_upper_int
-                    x_upper_lower_ext = x_lower_lower_ext 
-                    y_upper_lower_ext = y_lower_lower_ext
-                    x_upper_upper_ext = x_lower_upper_ext
-                    y_upper_upper_ext = y_lower_upper_ext 
+                
 
 
                 else:
-
+                    x = round(x, 2)
                     #Intradós
                     #Lista lower
                     #Encontrar el valor inmediatamente superior en la lista
@@ -167,6 +149,9 @@ def coordenadas_perfil(r,perfil_variable):
 
                     return y_airfoil
                 
+                if x >= 0.94:
+                    se = 1
+                
                 y_airfoil_anterior_intra = interpolate_coordinates(x,x_lower_lower_int,x_upper_lower_int,y_lower_lower_int,y_upper_lower_int)
                 y_airfoil_anterior_extra = interpolate_coordinates(x,x_lower_lower_ext,x_upper_lower_ext,y_lower_lower_ext,y_upper_lower_ext)
                 y_airfoil_posterior_intra = interpolate_coordinates(x,x_lower_upper_int,x_upper_upper_int,y_lower_upper_int,y_upper_upper_int)
@@ -178,20 +163,20 @@ def coordenadas_perfil(r,perfil_variable):
 
                     return y_coordinate
                 
-                y_coordinate_intra = interpolate_coordinates(r_puntomedio,r_lower,r_upper,y_airfoil_anterior_intra,y_airfoil_posterior_intra)
-                y_coordinate_extra = interpolate_coordinates(r_puntomedio,r_lower,r_upper,y_airfoil_anterior_extra,y_airfoil_posterior_extra)
+                y_coordinate_intra = interpolate_airfoil(r_puntomedio,r_lower,r_upper,y_airfoil_anterior_intra,y_airfoil_posterior_intra)
+                y_coordinate_extra = interpolate_airfoil(r_puntomedio,r_lower,r_upper,y_airfoil_anterior_extra,y_airfoil_posterior_extra)
                     
                 x_intra_extra.append(x)
                 y_intra.append(y_coordinate_intra)
                 y_extra.append(y_coordinate_extra)
-
+                
                 x += tol
 
             # Crear la lista x deseada
-            x_list = x_intra_extra[::-1][1:] + x_intra_extra[1:]
+            x_list = x_intra_extra[::-1] + x_intra_extra[1:]
 
             # Crear la lista y deseada
-            y_list = y_extra[::-1][1:] + y_intra[1:]
+            y_list = y_extra[::-1] + y_intra[1:]
 
             data = {'x': x_list, 'y': y_list}
             df_airfoil = pd.DataFrame(data)
@@ -207,14 +192,14 @@ def plot_intermediate_airfoil():
     perfil = True
 
     df_resultado = coordenadas_perfil(r, perfil)
-    print(df_resultado['x'])
     df_airfoil_lower = pd.read_csv('Coordenadas_NACA0012.csv')
     df_airfoil_upper = pd.read_csv('Coordenadas_NACA2414.csv')
 
+
     plt.figure(figsize=(10, 5))
-    plt.scatter(df_airfoil_lower['x'], df_airfoil_lower['y'], color='red', label='NACA0012', marker='o')
-    plt.scatter(df_airfoil_upper['x'], df_airfoil_upper['y'], color='green', label='NACA2414', marker='o')
-    plt.scatter(df_resultado['x'], df_resultado['y'],color='blue', marker='o', linestyle='-')
+    plt.plot(df_airfoil_lower['x'], df_airfoil_lower['y'], color='blue', label='NACA0012', marker='o')
+    plt.plot(df_airfoil_upper['x'], df_airfoil_upper['y'], color='green', label='NACA2414', marker='o')
+    plt.scatter(df_resultado['x'], df_resultado['y'],color='red')
 
     plt.title('Interpolación de Perfil de Coordenadas')
     plt.xlabel('x')
@@ -225,9 +210,9 @@ def plot_intermediate_airfoil():
 #-----------------------------------------------------------------#
 
 #Esta función lee en Datos si el perfil es variable o fijo. Si es fijo lee los archivos de datos para diferentes Re del apartado perfil fijo.
-#Si es variable lee las coordenadas del perfil para cada radio. Si el valor del radio tiene un perfil asignado, 
-#se leerá su archivo de coordenadas .csv. Si el radio no tiene un perfil asignado,
-#se realizará una interpolación entre las coordenadas de los perfiles anterior y posterior.
+#Si es variable lee el archivo de perfiles para cada radio. Si el valor del radio tiene un perfil asignado, 
+#se devolverá su archivo de datos correspondiente al Re de entrada. Si el radio no tiene un perfil asignado,
+#se realizará una interpolación entre las el archivo de datos de los perfiles anterior y posterior.
 
 #Los archivos de los perfiles intermedios sólo se calculan para j = 0 y C = 0, es decir, primera iteración.
 #En el resto de iteraciones se cogen los datos de la carpeta_salida. Si se desea cambiar el valor de C inicial, hay que hacerlo
@@ -235,7 +220,7 @@ def plot_intermediate_airfoil():
 
 def archivo_Re(r,perfil_variable,Re,df_csv_variable,j,C):
 
-    carpeta_salida = 'Archivos_NACA_Airfoil_Module'
+    carpeta_salida = 'Archivos_Perfiles_Interpolados'
 
     if perfil_variable == False:
         
@@ -405,15 +390,10 @@ def archivo_Re(r,perfil_variable,Re,df_csv_variable,j,C):
             else:
                 r_sen = format(r, ".2f")
                 nombre_df = 'df_Re_' + r_sen + '_' + str(Re) +'.csv'
-                carpeta = 'Archivos_NACA_Airfoil_Module'
+                carpeta = carpeta_salida
                 ruta_archivo = os.path.join(carpeta, nombre_df)
                 df_Re = pd.read_csv(ruta_archivo)
 
     return df_Re
 
 #-----------------------------------------------------------------#
-#PRUEBAS
-""" r = 0.25
-perfil = True
-Re = 50000
-archivo_Re(r,perfil,Re) """

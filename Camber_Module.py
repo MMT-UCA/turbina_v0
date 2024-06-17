@@ -7,7 +7,6 @@
 
 import pandas as pd
 import numpy as np
-import Datos
 import matplotlib.pyplot as plt
 
 #-----------------------------------------------------------------#

@@ -5,13 +5,14 @@
 
 import pandas as pd
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 import Extrapolate_Module
 import Interpolate_Module
-import Datos
 import Camber_Module
 import Factor_Corrector_Module
 import Airfoil_Module
+from Datos import Datos
 
 #-----------------------------------------------------------------#
 #Función que calcula Cl y Cd para Re = [50000, 100000, 200000, 500000, 1000000]
@@ -126,7 +127,7 @@ def Cl_Cd_corregido(alpha, Cl, Cd, Mach, r, perfil_variable,df_airfoil):
 
     espesor = Camber_Module.thickness_max(df_airfoil)
     curvatura_media = Camber_Module.camber_med(df_airfoil)
-    alpha_rad = alpha*Datos.pi/180
+    alpha_rad = alpha*math.pi/180
 
     Pi = np.pi
     Cl_zero = ((2 * Pi) / ((1 - (0) ** 2) ** 0.5)) * (1 - 0.77 * espesor) * (alpha_rad + 2 * curvatura_media)
@@ -162,38 +163,3 @@ def Cl_Cd_corregido(alpha, Cl, Cd, Mach, r, perfil_variable,df_airfoil):
 
 
 #-----------------------------------------------------------------#
-#PRUEBAS
-
-""" Cl, Cd = Interpolate_Extrapolate(11,54976.867535048)
-Cl_co, Cd_co = Cl_Cd_corregido(11,Cl,Cd,1.2)
-
-print('Cl,Cd:',Cl, Cd)
-print('Cl_corregido,Cd_corregido:',Cl_co, Cd_co) """
-
-#PLOT
-
-""" valores_Cl = []
-valores_Cd = []
-valores_alpha = []
-Re = 398465
-
-for alpha in range(-180, 180):
-    Cl, Cd = Interpolate_Extrapolate(alpha,Re)
-    print('alpha,Cl:', alpha, Cl)
-    # Agrega los valores a las listas correspondientes
-    valores_Cl.append(Cl)
-    valores_Cd.append(Cd)
-    valores_alpha.append(alpha)
-
-plt.plot(valores_alpha, valores_Cl, color='red')
-
-# Agrega etiquetas y título al gráfico
-plt.xlabel('α(°)')
-plt.ylabel('Cl')
-plt.title('Cl vs α')
-
-# Agrega una leyenda
-plt.legend()
-
-# Muestra el gráfico
-plt.show() """

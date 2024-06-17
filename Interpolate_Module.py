@@ -5,7 +5,6 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import Datos
 import Airfoil_Module
 
 #-----------------------------------------------------------------#
@@ -151,20 +150,4 @@ def interpolate_Cd(alpha,Re,r,perfil_variable,df_csv_variable,j,C):
     return Cd_final
 
 
-#PRUEBAS
-
-#df = pd.read_csv(Datos.url_Re50000, skiprows=10)
-#x_list = df['Alpha']
-#y_list = df['Cl']
-#alpha = 6.976800047586
-#lower_values, upper_values = interpolate_alpha(x_list, y_list, alpha)
-#print("Valor inferior de alpha y Cl:", lower_values)
-#print("Valor superior de alpha y Cl:", upper_values)
-#x_1, y_1 = lower_values
-#x_2, y_2 = upper_values
-#Cl_lower = interpolate_fcn(x_1,y_1,x_2,y_2,alpha)
-#print("Valor de Cl lower:", Cl_lower)
-#Re = 58000
-#Cl = interpolate(alpha,Re)
-#print("Valor de Cl:", Cl)
 

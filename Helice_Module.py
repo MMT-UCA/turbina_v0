@@ -94,7 +94,6 @@ def helice(C,Beta):
     perfil_variable = Datos.perfil_variable
     if perfil_variable == True:
         df_csv_variable = pd.read_csv(Datos.archivo_csv_variable)
-        #load_Re_map = Load_Module.load_Re(df_csv_variable)
     else:
         df_csv_variable = None
         
@@ -130,7 +129,6 @@ def helice(C,Beta):
             Mach = ((C_Tcuad) ** 0.5) / A_sonido
             #####Call Cl_Cd corregido#####
             Cl_corregido, Cd_corregido, transonico, supersonico = Interpolate_Extrapolate_Module.Cl_Cd_corregido(alfa,Cl,Cd,Mach,r_vind,perfil_variable,df_airfoil)
-
             #Cálculo de tracción y potencia
             dTrac = C_Tcuad * (Cl_corregido * math.cos(Phi_rad) - Cd_corregido * math.sin(Phi_rad)) * Datos.dr
             dQ = C_Tcuad * (Cl_corregido * math.sin(Phi_rad) + Cd_corregido * math.cos(Phi_rad)) * r_vind * Datos.dr
@@ -267,6 +265,7 @@ def csv_complete(betas):
             J = C/(Datos.RPS * Datos.D)
             if T_ant != 0:
                 T, Q, W = helice(C, Beta)
+                print(C,Beta,T)
                 T_ant = T
             else:
                 T = 0
@@ -305,19 +304,19 @@ def csv_complete(betas):
                 datos_eta[C].append(eta)
 
 
-    nombre_archivo_T = 'T_C_cuerdatorsion_var_airfoil.csv'
+    nombre_archivo_T = 'Archivos_Resultados/T_C.csv'
     crear_csv(datos_T, nombre_archivo_T)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_T}' en la carpeta 'Archivos_Resultados'.")
-    nombre_archivo_W = 'W_C_cuerdatorsion_var_airfoil.csv'
+    nombre_archivo_W = 'Archivos_Resultados/W_C.csv'
     crear_csv_W(datos_W, nombre_archivo_W)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_W}' en la carpeta 'Archivos_Resultados'.")
-    nombre_archivo_eta = 'eta_C_cuerdatorsion_var_airfoil.csv'
+    nombre_archivo_eta = 'Archivos_Resultados/eta_C.csv'
     crear_csv_eta(datos_eta, nombre_archivo_eta)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_eta}' en la carpeta 'Archivos_Resultados'.")
-    nombre_archivo_Ct = 'Ct_J_cuerdatorsion_var_airfoil.csv'
+    nombre_archivo_Ct = 'Archivos_Resultados/Ct_J.csv'
     crear_csv_Ct(datos_Ct, nombre_archivo_Ct)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_Ct}' en la carpeta 'Archivos_Resultados'.")
-    nombre_archivo_Cp = 'Cp_J_cuerdatorsion_var_airfoil.csv'
+    nombre_archivo_Cp = 'Archivos_Resultados/Cp_J.csv'
     crear_csv_Cp(datos_Cp, nombre_archivo_Cp)
     print(f"Se ha creado el archivo CSV '{nombre_archivo_Cp}' en la carpeta 'Archivos_Resultados'.")
 
@@ -335,17 +334,17 @@ def plot_complete(betas):
         df = pd.read_csv(Datos.T_C_csv)
         valores_C = df['C']
 
-        colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'brown', 'cyan', 'magenta']
+        colores = ['cyan', 'red', 'green', 'blue', 'yellow', 'magenta', 'brown', 'pink']
 
         i = 1
         plt.figure(figsize=(10, 7))
         for Beta, color in zip(betas, colores):
             columna_T = f"T(B={Beta}°)"
             valores_T = df[columna_T]
-            plt.plot(valores_C, valores_T,label=f'Beta = {Beta}', color=color)
+            plt.plot(valores_C, valores_T,label=f'Beta = {Beta}°', color=color)
 
-        plt.xlabel('C')
-        plt.ylabel('T')
+        plt.xlabel('C [m/s]')
+        plt.ylabel('T [N]')
         plt.title('T vs C')
 
         plt.legend()
@@ -361,17 +360,17 @@ def plot_complete(betas):
         df = pd.read_csv(Datos.W_C_csv)
         valores_C = df['C']
 
-        colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'brown', 'cyan', 'magenta']
+        colores = ['cyan', 'red', 'green', 'blue', 'yellow', 'magenta', 'brown', 'pink']
 
         i = 1
         plt.figure(figsize=(10, 7))
         for Beta, color in zip(betas, colores):
             columna_W = f"W(B={Beta}°)"
             valores_W = df[columna_W]
-            plt.plot(valores_C, valores_W,label=f'Beta = {Beta}', color=color)
+            plt.plot(valores_C, valores_W,label=f'Beta = {Beta}°', color=color)
 
-        plt.xlabel('C')
-        plt.ylabel('W')
+        plt.xlabel('C [m/s]')
+        plt.ylabel('W [W]')
         plt.title('W vs C')
 
         plt.legend()
@@ -387,16 +386,16 @@ def plot_complete(betas):
         df = pd.read_csv(Datos.eta_C_csv)
         valores_C = df['C']
 
-        colores = ['red', 'blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'brown', 'cyan', 'magenta']
+        colores = ['cyan', 'red', 'green', 'blue', 'yellow', 'magenta', 'brown', 'pink']
 
         i = 1
         plt.figure(figsize=(10, 7))
         for Beta, color in zip(betas, colores):
             columna_eta = f"eta(B={Beta}°)"
             valores_eta = df[columna_eta]
-            plt.plot(valores_C, valores_eta,label=f'Beta = {Beta}', color=color)
+            plt.plot(valores_C, valores_eta,label=f'Beta = {Beta}°', color=color)
 
-        plt.xlabel('C')
+        plt.xlabel('C [m/s]')
         plt.ylabel('eta')
         plt.title('eta vs C')
 

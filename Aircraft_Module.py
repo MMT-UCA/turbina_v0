@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------#
-#MÓDULO PRINCIPAL - AVIÓN
+#MÓDULO AVIÓN
 #-----------------------------------------------------------------#
 #IMPORTS
 
@@ -62,6 +62,7 @@ def principal(Beta):
         C = C_dt
         x = x_dt
         lista.append({'t': t,'x': x,'C': C, 'a': a, 'Fd': Fd, 'T': T, 'W': W})
+        print(t)
 
     return lista
 #-----------------------------------------------------------------#
@@ -92,7 +93,7 @@ def csv_principal():
 
     datos_principal = principal(Datos.Beta)
 
-    nombre_archivo = 'resultados_principal_cuerdatorsion_var.csv'
+    nombre_archivo = 'Archivos_Resultados/resultados_principal.csv'
     crear_csv_principal(datos_principal, nombre_archivo)
     print(f"Se ha creado el archivo CSV '{nombre_archivo}'.")
 
@@ -116,14 +117,14 @@ def plot_complete_aircraft():
 
         fig, ax1 = plt.subplots(figsize=(9, 6))
 
-        ax1.set_xlabel('Tiempo')
-        ax1.set_ylabel('T y Fd', color='black')
+        ax1.set_xlabel('Tiempo [s]')
+        ax1.set_ylabel('T y Fd [N]', color='black')
         ax1.plot(t, T, color='green', linestyle='--', label='T')
         ax1.plot(t, Fd, color='red', linestyle='-.', label='Fd')
         ax1.tick_params(axis='y', labelcolor='black')
 
         ax2 = ax1.twinx()
-        ax2.set_ylabel('C', color='black')
+        ax2.set_ylabel('C [m/s]', color='black')
         ax2.plot(t, C, color='blue', linestyle='--', label='C')
         ax2.tick_params(axis='y', labelcolor='black')
 
@@ -147,13 +148,13 @@ def plot_complete_aircraft():
 
         fig, ax1 = plt.subplots(figsize=(9, 6))
 
-        ax1.set_xlabel('Tiempo')
-        ax1.set_ylabel('W', color='black')
+        ax1.set_xlabel('Tiempo [s]')
+        ax1.set_ylabel('W [W]', color='black')
         ax1.plot(t, W, color='red', linestyle='--', label='W')
         ax1.tick_params(axis='y', labelcolor='black')
 
         ax2 = ax1.twinx()
-        ax2.set_ylabel('a', color='black')
+        ax2.set_ylabel('a [m/s^2]', color='black')
         ax2.plot(t, a, color='blue', linestyle='--', label='a')
         ax2.tick_params(axis='y', labelcolor='black')
 

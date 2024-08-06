@@ -1,11 +1,11 @@
 # Datos
 
 [avion]
-m = 5216 #kg
-n_motor = 2
+m = 1110 #kg
+n_motor = 1
 C_d = 0.02
-A_a = 16 #m^2
-C_crucero = 593 #km/h
+A_a = 16.2 #m^2
+C_crucero = 302 #km/h
 dt = 1 #s
 dt_acel = 1 #s
 t_fin = 60 #s
@@ -16,14 +16,14 @@ x = 0
 
 [helice]
 Beta = 60 #°
-D = 2.2 #m
+D = 2.3 #m
 r_o = 0.15 #m
 RPM = 2000
 RPS = 33.33  
-Palas = 5
+Palas = 2
 dr = 0.1 #m
 omega = 209.44  
-Ah = 3.8013271108436504  #m^2
+Ah = 4.1549  #m^2
 
 [velocidades_inducidas]
 m_vind = 1
@@ -70,6 +70,24 @@ url__NACA2415_Re100000 = "Archivos_NACA/xf-naca2415-il-100000.csv"
 url__NACA2415_Re200000 = "Archivos_NACA/xf-naca2415-il-200000.csv"
 url__NACA2415_Re500000 = "Archivos_NACA/xf-naca2415-il-500000.csv"
 url__NACA2415_Re1000000 = "Archivos_NACA/xf-naca2415-il-1000000.csv"
+coordenadascircle = "Archivos_NACA/Coordenadas_circle.csv"
+url__circle_Re50000 = "Archivos_NACA/xf-circle-il-50000.csv"
+url__circle_Re100000 = "Archivos_NACA/xf-circle-il-100000.csv"
+url__circle_Re200000 = "Archivos_NACA/xf-circle-il-200000.csv"
+url__circle_Re500000 = "Archivos_NACA/xf-circle-il-500000.csv"
+url__circle_Re1000000 = "Archivos_NACA/xf-circle-il-1000000.csv"
+coordenadasNACA23012 = "Archivos_NACA/Coordenadas_NACA23012.csv"
+url__NACA23012_Re50000 = "Archivos_NACA/xf-naca23012-il-50000.csv"
+url__NACA23012_Re100000 = "Archivos_NACA/xf-naca23012-il-100000.csv"
+url__NACA23012_Re200000 = "Archivos_NACA/xf-naca23012-il-200000.csv"
+url__NACA23012_Re500000 = "Archivos_NACA/xf-naca23012-il-500000.csv"
+url__NACA23012_Re1000000 = "Archivos_NACA/xf-naca23012-il-1000000.csv"
+coordenadasNACA23015 = "Archivos_NACA/Coordenadas_NACA23015.csv"
+url__NACA23015_Re50000 = "Archivos_NACA/xf-naca23015-il-50000.csv"
+url__NACA23015_Re100000 = "Archivos_NACA/xf-naca23015-il-100000.csv"
+url__NACA23015_Re200000 = "Archivos_NACA/xf-naca23015-il-200000.csv"
+url__NACA23015_Re500000 = "Archivos_NACA/xf-naca23015-il-500000.csv"
+url__NACA23015_Re1000000 = "Archivos_NACA/xf-naca23015-il-1000000.csv"
 
 [urls_perfil_fijo]
 url_Re50000 = "Archivos_NACA/xf-naca2411-il-50000.csv"
@@ -80,9 +98,9 @@ url_Re1000000 = "Archivos_NACA/xf-naca2411-il-1000000.csv"
 archivo_csv = "Archivos_Datos/Coordenadas.csv"
 
 [archivos_resultados]
-T_C_csv = "Archivos_Resultados/T_C_cuerdatorsion_var_airfoil.csv"
-W_C_csv = "Archivos_Resultados/W_C_cuerdatorsion_var_airfoil.csv"
-eta_C_csv = "Archivos_Resultados/eta_C_cuerdatorsion_var_airfoil.csv"
-Ct_J_csv = "Archivos_Resultados/Ct_J_cuerdatorsion_var_airfoil.csv"
-Cp_J_csv = "Archivos_Resultados/Cp_J_cuerdatorsion_var_airfoil.csv"
-resultados_principal_csv = "Archivos_Resultados/resultados_principal_cuerdatorsion_var_airfoil.csv"
+T_C_csv = "Archivos_Resultados/T_C.csv"
+W_C_csv = "Archivos_Resultados/W_C.csv"
+eta_C_csv = "Archivos_Resultados/eta_C.csv"
+Ct_J_csv = "Archivos_Resultados/Ct_J.csv"
+Cp_J_csv = "Archivos_Resultados/Cp_J.csv"
+resultados_principal_csv = "Archivos_Resultados/resultados_principal.csv"

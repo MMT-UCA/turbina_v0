@@ -9,14 +9,14 @@ import Aircraft_Module
 #-----------------------------------------------------------------#
 #Cálculo .csv T-C, W-C, eta-C, Ct-J, Cp-J de Módulo Hélice
 
-valores_beta = [10, 20, 30, 40, 50, 60, 70, 80]
+valores_beta = [10,20,30,40,50,60,70,80]
 
 Helice_Module.csv_complete(valores_beta)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 #Plot de T-C, W-C, eta-C
 
-valores_plot_beta = [10, 20, 30, 40, 50, 60]
+valores_plot_beta = [10, 20, 30, 40, 50, 60, 70, 80]
 
 Helice_Module.plot_complete(valores_plot_beta)
 
@@ -26,7 +26,7 @@ Helice_Module.plot_complete(valores_plot_beta)
 Aircraft_Module.csv_principal()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-#Plot de T-C, W-C, eta-C
+#Plot de T-Fd-C, W-a
 
 Aircraft_Module.plot_complete_aircraft()
 

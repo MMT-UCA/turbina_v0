@@ -163,3 +163,41 @@ def Cl_Cd_corregido(alpha, Cl, Cd, Mach, r, perfil_variable,df_airfoil):
 
 
 #-----------------------------------------------------------------#
+#Prueba extrapolación comparación Airfoil Tools
+
+def prueba_extra():
+
+    Re = 500000
+    perfil_variable = False
+    r = 0.2
+    r_vind = r
+    df_airfoil = Airfoil_Module.coordenadas_perfil(r_vind,perfil_variable)
+    df_csv_variable = None
+    j = 0
+    C = 0
+    valores_Cl = []
+    valores_Cd = []
+    valores_alpha = []
+
+    df = pd.read_csv(Datos.url_Re500000, skiprows=10)
+    alpha_column = df['Alpha']
+    Cl_column = df['Cl']
+    Cd_column = df['Cd']
+
+    for alpha in range(-180, 181):
+
+        Cl, Cd = Interpolate_Extrapolate(alpha,Re,r,perfil_variable,df_airfoil,df_csv_variable,j,C)
+        valores_Cl.append(Cl)
+        valores_Cd.append(Cd)
+        valores_alpha.append(alpha)
+
+    plt.plot(valores_alpha, valores_Cl, color='red', label='Extrapolación Lorenzo Battisti')
+    plt.scatter(alpha_column, Cl_column, s=13, color='black', label='Datos experimentales Airfoil Tools' )
+    plt.xlabel('α(°)')
+    plt.ylabel('Cd')
+    plt.title('Cd vs α')
+
+    plt.legend()
+
+    plt.show
+

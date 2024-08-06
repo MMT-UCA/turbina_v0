@@ -32,20 +32,25 @@ def alpha_zero(df):
     alpha_column = df['Alpha'].tolist()
     Cl_column = df['Cl'].tolist()
 
-    indice_ultimo_negativo = Cl_column.index(next(valor for valor in Cl_column if valor < 0))
-    indice_primer_positivo = indice_ultimo_negativo + 1
-
-    while indice_primer_positivo < len(Cl_column) and Cl_column[indice_primer_positivo] <= 0:
-        indice_primer_positivo += 1
+    if all(value == 0 for value in Cl_column):
+        alphazero = 0
     
-    indice_ultimo_negativo = indice_primer_positivo - 1
-    
-    Cl_negativo = Cl_column[indice_ultimo_negativo]
-    Cl_positivo = Cl_column[indice_primer_positivo]
-    alpha_negativo = alpha_column[indice_ultimo_negativo]
-    alpha_positivo = alpha_column[indice_primer_positivo]
+    else:
 
-    alphazero = alpha_positivo - Cl_positivo*((alpha_positivo-alpha_negativo)/(Cl_positivo-Cl_negativo))
+        indice_ultimo_negativo = Cl_column.index(next(valor for valor in Cl_column if valor < 0))
+        indice_primer_positivo = indice_ultimo_negativo + 1
+
+        while indice_primer_positivo < len(Cl_column) and Cl_column[indice_primer_positivo] <= 0:
+            indice_primer_positivo += 1
+        
+        indice_ultimo_negativo = indice_primer_positivo - 1
+        
+        Cl_negativo = Cl_column[indice_ultimo_negativo]
+        Cl_positivo = Cl_column[indice_primer_positivo]
+        alpha_negativo = alpha_column[indice_ultimo_negativo]
+        alpha_positivo = alpha_column[indice_primer_positivo]
+
+        alphazero = alpha_positivo - Cl_positivo*((alpha_positivo-alpha_negativo)/(Cl_positivo-Cl_negativo))
 
     return alphazero 
 

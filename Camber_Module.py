@@ -34,6 +34,8 @@ def coordinates_lists(x_coordinates,y_coordinates):
 #Intervalo en el que se encuentra el x a interpolar
 def interval(x_list, y_list,x):
 
+    x = round(x, 3)
+
     if x == 0:
         x_upper = 0
         x_lower = 0

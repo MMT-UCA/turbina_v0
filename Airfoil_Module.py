@@ -149,8 +149,6 @@ def coordenadas_perfil(r,perfil_variable):
 
                     return y_airfoil
                 
-                if x >= 0.94:
-                    se = 1
                 
                 y_airfoil_anterior_intra = interpolate_coordinates(x,x_lower_lower_int,x_upper_lower_int,y_lower_lower_int,y_upper_lower_int)
                 y_airfoil_anterior_extra = interpolate_coordinates(x,x_lower_lower_ext,x_upper_lower_ext,y_lower_lower_ext,y_upper_lower_ext)
@@ -192,19 +190,20 @@ def plot_intermediate_airfoil():
     perfil = True
 
     df_resultado = coordenadas_perfil(r, perfil)
-    df_airfoil_lower = pd.read_csv('Coordenadas_NACA0012.csv')
-    df_airfoil_upper = pd.read_csv('Coordenadas_NACA2414.csv')
+    df_airfoil_lower = pd.read_csv('Archivos_NACA/Coordenadas_NACA0012.csv')
+    df_airfoil_upper = pd.read_csv('Archivos_NACA/Coordenadas_NACA2414.csv')
 
 
     plt.figure(figsize=(10, 5))
     plt.plot(df_airfoil_lower['x'], df_airfoil_lower['y'], color='blue', label='NACA0012', marker='o')
     plt.plot(df_airfoil_upper['x'], df_airfoil_upper['y'], color='green', label='NACA2414', marker='o')
-    plt.scatter(df_resultado['x'], df_resultado['y'],color='red')
+    plt.scatter(df_resultado['x'], df_resultado['y'],color='red', label='Perfil interpolado')
 
     plt.title('Interpolación de Perfil de Coordenadas')
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.grid(True)
+    plt.grid(False)
+    plt.legend()
     plt.show()
 
 #-----------------------------------------------------------------#

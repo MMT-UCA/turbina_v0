@@ -16,3 +16,5 @@ Airfoil_Module calcula las coordenadas del perfil para cada radio de la pala y l
 
 Los resultados se guardan en la carpeta Archivos_Resultados.
 
+Para ver una guía de utilización del software ver el Anexo: Manual de Usuario del proyecto.
+

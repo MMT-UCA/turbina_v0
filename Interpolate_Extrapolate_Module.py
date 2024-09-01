@@ -19,7 +19,7 @@ from Datos import Datos
 def Interpolate_Extrapolate_Re(alpha,Re,r,perfil_variable,df_airfoil,df_csv_variable,j,C):
     # Re listado
 
-    for Re in [50000, 100000, 200000, 500000, 1000000]:
+    if Re in [50000, 100000, 200000, 500000, 1000000]:
         df = Airfoil_Module.archivo_Re(r,perfil_variable,Re,df_csv_variable,j,C)
 
     alpha_column = df['Alpha']
@@ -167,7 +167,7 @@ def Cl_Cd_corregido(alpha, Cl, Cd, Mach, r, perfil_variable,df_airfoil):
 
 def prueba_extra():
 
-    Re = 500000
+    Re = 50000
     perfil_variable = False
     r = 0.2
     r_vind = r
@@ -179,7 +179,7 @@ def prueba_extra():
     valores_Cd = []
     valores_alpha = []
 
-    df = pd.read_csv(Datos.url_Re500000, skiprows=10)
+    df = pd.read_csv(Datos.url_Re50000, skiprows=10)
     alpha_column = df['Alpha']
     Cl_column = df['Cl']
     Cd_column = df['Cd']
@@ -194,10 +194,9 @@ def prueba_extra():
     plt.plot(valores_alpha, valores_Cl, color='red', label='Extrapolación Lorenzo Battisti')
     plt.scatter(alpha_column, Cl_column, s=13, color='black', label='Datos experimentales Airfoil Tools' )
     plt.xlabel('α(°)')
-    plt.ylabel('Cd')
-    plt.title('Cd vs α')
+    plt.ylabel('Cl')
+    plt.title('Cl vs α')
 
     plt.legend()
 
     plt.show
-

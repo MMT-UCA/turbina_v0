@@ -41,7 +41,7 @@ torsion_csv = "Archivos_Datos/datos_torsion.csv"
 alfa_diseno = 5 #°
 
 [perfil]
-perfil_variable = true
+perfil_variable = false
 archivo_csv_variable = "Archivos_Datos/Coordenadas_perfilvariable.csv"
 archivo_csv = "Archivos_Datos/Coordenadas.csv"
 

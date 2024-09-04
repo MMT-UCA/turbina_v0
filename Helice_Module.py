@@ -178,7 +178,12 @@ def csv_complete(betas):
         with open(nombre_archivo, 'w', newline='') as archivo_csv:
             escritor_csv = csv.writer(archivo_csv)
 
-            encabezados = ['C', 'T(B=10°)', 'T(B=20°)', 'T(B=30°)', 'T(B=40°)', 'T(B=50°)', 'T(B=60°)', 'T(B=70°)', 'T(B=80°)']
+            encabezados = ['C']  
+            for beta in betas:
+                encabezados.append(f'T(B={beta}°)')
+
+
+            #encabezados = ['C', 'T(B=10°)', 'T(B=20°)', 'T(B=30°)', 'T(B=40°)', 'T(B=50°)', 'T(B=60°)', 'T(B=70°)', 'T(B=80°)']
             escritor_csv.writerow(encabezados)
 
             for C, valores in datos.items():
@@ -193,7 +198,11 @@ def csv_complete(betas):
         with open(nombre_archivo, 'w', newline='') as archivo_csv:
             escritor_csv = csv.writer(archivo_csv)
 
-            encabezados = ['C', 'W(B=10°)', 'W(B=20°)', 'W(B=30°)', 'W(B=40°)', 'W(B=50°)', 'W(B=60°)', 'W(B=70°)', 'W(B=80°)']
+            encabezados = ['C']  
+            for beta in betas:
+                encabezados.append(f'T(B={beta}°)')
+
+            #encabezados = ['C', 'W(B=10°)', 'W(B=20°)', 'W(B=30°)', 'W(B=40°)', 'W(B=50°)', 'W(B=60°)', 'W(B=70°)', 'W(B=80°)']
             escritor_csv.writerow(encabezados)
 
             for C, valores in datos.items():
@@ -208,7 +217,11 @@ def csv_complete(betas):
         with open(nombre_archivo, 'w', newline='') as archivo_csv:
             escritor_csv = csv.writer(archivo_csv)
 
-            encabezados = ['C', 'eta(B=10°)', 'eta(B=20°)', 'eta(B=30°)', 'eta(B=40°)', 'eta(B=50°)', 'eta(B=60°)', 'eta(B=70°)', 'eta(B=80°)']
+            encabezados = ['C']  
+            for beta in betas:
+                encabezados.append(f'T(B={beta}°)')
+
+            #encabezados = ['C', 'eta(B=10°)', 'eta(B=20°)', 'eta(B=30°)', 'eta(B=40°)', 'eta(B=50°)', 'eta(B=60°)', 'eta(B=70°)', 'eta(B=80°)']
             escritor_csv.writerow(encabezados)
 
             for C, valores in datos.items():
@@ -223,7 +236,11 @@ def csv_complete(betas):
         with open(nombre_archivo, 'w', newline='') as archivo_csv:
             escritor_csv = csv.writer(archivo_csv)
 
-            encabezados = ['J', 'Ct(B=10°)', 'Ct(B=20°)', 'Ct(B=30°)', 'Ct(B=40°)', 'Ct(B=50°)', 'Ct(B=60°)', 'Ct(B=70°)', 'Ct(B=80°)']
+            encabezados = ['J']  
+            for beta in betas:
+                encabezados.append(f'T(B={beta}°)')
+
+            #encabezados = ['J', 'Ct(B=10°)', 'Ct(B=20°)', 'Ct(B=30°)', 'Ct(B=40°)', 'Ct(B=50°)', 'Ct(B=60°)', 'Ct(B=70°)', 'Ct(B=80°)']
             escritor_csv.writerow(encabezados)
 
             for J, valores in datos.items():
@@ -238,7 +255,11 @@ def csv_complete(betas):
         with open(nombre_archivo, 'w', newline='') as archivo_csv:
             escritor_csv = csv.writer(archivo_csv)
 
-            encabezados = ['J', 'Cp(B=10°)', 'Cp(B=20°)', 'Cp(B=30°)', 'Cp(B=40°)', 'Cp(B=50°)', 'Cp(B=60°)', 'Cp(B=70°)', 'Cp(B=80°)']
+            encabezados = ['J']  
+            for beta in betas:
+                encabezados.append(f'T(B={beta}°)')
+
+            #encabezados = ['J', 'Cp(B=10°)', 'Cp(B=20°)', 'Cp(B=30°)', 'Cp(B=40°)', 'Cp(B=50°)', 'Cp(B=60°)', 'Cp(B=70°)', 'Cp(B=80°)']
             escritor_csv.writerow(encabezados)
 
             for J, valores in datos.items():

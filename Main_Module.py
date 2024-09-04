@@ -16,7 +16,7 @@ Helice_Module.csv_complete(valores_beta)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 #Plot de T-C, W-C, eta-C
 
-valores_plot_beta = [10, 20, 30, 40, 50, 60, 70, 80]
+valores_plot_beta = [10,20,30,40,50,60,70,80]
 
 Helice_Module.plot_complete(valores_plot_beta)
 
